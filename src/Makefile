@@ -16,7 +16,7 @@ CC += -D MACOS
 MEMORY_TEST = leaks -atExit --
 else
 CC += -D LINUX
-LIBS += -lcheck -lsubunit -lrt -lm -lpthread
+LIBS += -lsubunit -lrt -lm -lpthread
 MEMORY_TEST = valgrind --trace-children=yes --leak-check=yes --track-origins=yes
 endif
 
@@ -32,10 +32,6 @@ $(MAIN_FILE).o: $(MAIN_FILE).c $(MAIN_FILE).h
 $(MAIN_FILE).a: $(MAIN_FILE).o
 	ar rc $(MAIN_FILE).a $(MAIN_FILE).o
 	ranlib $(MAIN_FILE).a
-
-lcov_report: 
-	lcov --capture --directory . --output-file s21_coverage.info
-	genhtml s21_coverage.info --output-directory s21_lcov_report
 
 gcov_report:
 	gcc -o $(TEST) $(TEST).c $(MAIN_FILE).c $(LIBS) $(LDFLAGS)
