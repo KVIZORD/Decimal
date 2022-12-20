@@ -1,11 +1,10 @@
 typedef struct 
 {
-    int sign: 1;
-    int empty_1: 7;
-    int exponent: 8;
-    int empty_2: 16;
-    int bits[3];
-
+    // int sign: 1;
+    // int empty_1: 7;
+    // int exponent: 8;
+    // int empty_2: 16;
+    int bits[4];
 } s21_decimal;
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);

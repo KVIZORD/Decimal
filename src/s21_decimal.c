@@ -1,9 +1,14 @@
 #include "s21_decimal.h"
 #include <stdbool.h>
 #include <stdio.h>
+#include <limits.h>
 
 
+#define BITS_IN_INT 32
 #define COUNT_INT_IN_DECIMAL 3
+#define BIT_SIGN (BITS_IN_INT - 1)
+#define BIT_EXP_START 16
+#define BIT_EXP_END 23
 
 void printf_decimal(s21_decimal value);
 void printf_byte(int number);
@@ -16,16 +21,14 @@ bool reset_bit(int* number, int ind);
 void print_int128(__int128_t value);
 
 int main() {
-    s21_decimal a = {0, 0, 0, 0, {2,     2, 77}};
-    s21_decimal b = {0, 0, 0, 0, {1,     1,  1}};
-    s21_decimal c = {0, 0, 0, 0, {0,     0,  0}};
-    int bits[4] = {1, 2, 3, 4};
+    s21_decimal a = {{0, 2, 2, 77}};
+    s21_decimal b = {{0, 1, 1,  1}};
+    s21_decimal c = {{0, 0, 0,  0}};
     
     sum_decimal(a, b, &c);
     printf_decimal(a);
     printf_decimal(b);
     printf_decimal(c);
-    print_int128((__int128_t)bits);
     // int a = 332443;
     // int b = 5682;
     // int c = 12340;
@@ -42,8 +45,12 @@ int main() {
     return 0;
 }
 
-void print_int128(__int128_t value) {
-    printf("%lld%016lld\n", (int64_t)(value >> 64), (int64_t)value);
+int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    // for (int i = BIT_EXP_END; i <= BIT_EXP_START; i++) {
+
+    // }
+
+    
 }
 
 bool sum_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
@@ -97,6 +104,7 @@ bool set_bit(int* number, int ind) {
     *number |= 1 << ind;
     return true;
 }
+
 bool reset_bit(int* number, int ind) {  
     *number &= ~(1 << ind);
     return true;
