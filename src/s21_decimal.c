@@ -3,85 +3,102 @@
 #include <stdio.h>
 
 
-void printf_bit(int number);
-char *s21_itoa(unsigned long long val, int base);
-unsigned int sum_int(int value_1, int value_2, int* result);
-bool get_bit(int number, int ind);
-bool set_bit(int* number, int ind, bool state);
+#define COUNT_INT_IN_DECIMAL 3
 
+void printf_decimal(s21_decimal value);
+void printf_byte(int number);
+char *s21_itoa(unsigned long long val, int base);
+bool sum_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result);
+bool sum_int(int value_1, int value_2, int* result, bool transfer_bit);
+bool get_bit(int number, int ind);
+bool set_bit(int* number, int ind);
+bool reset_bit(int* number, int ind);
+void print_int128(__int128_t value);
 
 int main() {
-    int a = 343;
-    int b = 5682;
-    int c = 0;
+    s21_decimal a = {0, 0, 0, 0, {2,     2, 77}};
+    s21_decimal b = {0, 0, 0, 0, {1,     1,  1}};
+    s21_decimal c = {0, 0, 0, 0, {0,     0,  0}};
+    int bits[4] = {1, 2, 3, 4};
+    
+    sum_decimal(a, b, &c);
+    printf_decimal(a);
+    printf_decimal(b);
+    printf_decimal(c);
+    print_int128((__int128_t)bits);
+    // int a = 332443;
+    // int b = 5682;
+    // int c = 12340;
     // printf("%\n");
-    printf_bit(a);
-    printf_bit(b);
-    sum_int(a, b, &c);
-    printf_bit(c);
-    printf_bit(a+b);
-    printf("%d\n", c);
-    printf("%d\n", a+b);
+    // printf_bit(a);
+    // printf_bit(b);
+    // sum_int(a, b, &c, false);
+    // printf_bit(c);
+    // printf_bit(a+b);
+    // printf("%d\n", c);
+    // printf("%d\n", a+b);
     // printf_bit(a+b);
     // printf("%32s\n", s21_itoa(b, 2));
     return 0;
 }
 
+void print_int128(__int128_t value) {
+    printf("%lld%016lld\n", (int64_t)(value >> 64), (int64_t)value);
+}
 
-unsigned int sum_int(int value_1, int value_2, int* result) {
-    bool transfer = false;
+bool sum_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
+    bool transfer_bit = false;
+    for (int i = 0; i < COUNT_INT_IN_DECIMAL; i++) {
+        transfer_bit = sum_int(value_1.bits[i], value_2.bits[i], &(result->bits[i]), transfer_bit);
+    }
+    return transfer_bit;
+}
+
+bool sum_int(int value_1, int value_2, int* result, bool transfer_bit) {
     for (int i = 0; i < 32; i++) {
         bool b_1 = get_bit(value_1, i);
         bool b_2 = get_bit(value_2, i);
-        if (b_1 && b_2 && transfer) {
-            set_bit(result, i, true);
-        } else if ((b_1 && b_2) || (b_1 && transfer) || (b_2 && transfer)) {
-            set_bit(result, i, false);
-            transfer = true;
-        } else if (b_1 || b_2 || transfer) {
-            set_bit(result, i, true);
-            transfer = false;
+        if (b_1 && b_2 && transfer_bit) {
+            set_bit(result, i);
+        } else if ((b_1 && b_2) || (b_1 && transfer_bit) || (b_2 &&transfer_bit)) {
+            reset_bit(result, i);
+            transfer_bit = true;
+        } else if (b_1 || b_2 || transfer_bit) {
+            set_bit(result, i);
+            transfer_bit = false;
         } else {
-            set_bit(result, i, false);
+            reset_bit(result, i);
         }
     }
-    return transfer;
+    return transfer_bit;
 }
 
-void printf_bit(int number) {
+void printf_byte(int number) {
     unsigned int b;
     for (int i = 31; i >= 0; i--) {
         b = number & (1 << i);
         printf("%d", b >> i);
     }
+   
+}
+
+void printf_decimal(s21_decimal value) {
+    for (int i = 0; i < COUNT_INT_IN_DECIMAL; i++) {
+        printf_byte(value.bits[i]);
+    }
     printf("\n");
 }
-
-char *s21_itoa(unsigned long long val, int base) {
-  static char buf[32] = {0};
-  int i = 30;
-  if (val == 0) {
-    buf[i] = '0';
-    i--;
-  } else {
-    for (; val > 0 && i > 0; i--, val /= base) {
-      buf[i] = "0123456789abcdef"[val % base];
-    }
-  }
-
-  return &(buf[i + 1]);
-}
-
 
 bool get_bit(int number, int ind) { 
     return number & (1 << ind);
 }
 
-bool set_bit(int* number, int ind, bool state) {  
+bool set_bit(int* number, int ind) {  
+    *number |= 1 << ind;
+    return true;
+}
+bool reset_bit(int* number, int ind) {  
     *number &= ~(1 << ind);
-    if (state) {
-        *number |= 1 << ind;
-    }
     return true;
 }
 
