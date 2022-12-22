@@ -1,5 +1,5 @@
 
-#define BITS_IN_INT 31          // кол-во бит в инте
+#define BITS_IN_INT 32          // кол-во бит в инте
 #define INTS_IN_DECIMAL 3       // кол-во INT хранящих значащее число
 #define META_NUMBER_INT 3       // номер INT хранящий знак и порядок в decimal
 #define BIT_SIGN BITS_IN_INT    // номер бита знака в INT
