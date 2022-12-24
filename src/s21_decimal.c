@@ -9,10 +9,14 @@
 bool sum_ints(int value_1, int value_2, int* result, bool transfer_bit);
 bool sum_arr_int(int* value_1, int* value_2, int* result, int count_int);
 int sub_arr_int(int* value_1, int* value_2, int* result, int count_int);
-
+int s21_div_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
+void s21_copy_decimal(s21_decimal src, s21_decimal* dst);
+bool s21_is_zero_decimal(s21_decimal value);
 bool copy_arr_ints(int* src, int* dst, int count_int_src);
+bool left_shift_decimal_ints(s21_decimal* value);
 bool left_shift_one_arr_int(int* ints, int num_int);
 bool left_shift_arr_int(int* ints, int num_int, unsigned int offset);
+void decimal_clear(s21_decimal* value);
 
 int get_sign(s21_decimal value);
 void set_sign(s21_decimal* value, int sign);
@@ -22,18 +26,19 @@ int get_sum_exponent(s21_decimal value_1, s21_decimal value_2);
 void convert_decimal_to_ones_complement(s21_decimal value, s21_decimal *result);
 void convert_decimal_to_twos_complement(s21_decimal value, s21_decimal *result);
 
-// РАБОТА С БИТАМИ - нумерация с нуля
-bool get_bit_decimal(s21_decimal value, int num_int, int ind);
-bool set_bit_decimal(s21_decimal* value, int num_int, int ind);
-bool reset_bit_decimal(s21_decimal* value, int num_int, int ind);
-bool get_bit_int(int number, int ind);
-bool set_bit_int(int* number, int ind);
-bool reset_bit_int(int* number, int ind);
-bool get_bit_arr_int(int* value, int num_int, int ind);
-bool set_bit_arr_int(int* value, int num_int, int ind);
-bool reset_bit_arr_int(int* value, int num_int, int ind);
+int get_bit_decimal(s21_decimal value, int num_int, int ind);
+int set_bit_decimal(s21_decimal* value, int num_int, int ind);
+int reset_bit_decimal(s21_decimal* value, int num_int, int ind);
+int get_bit_double_decimal(s21_double_decimal value, int num_int, int ind);
+int set_bit_double_decimal(s21_double_decimal* value, int num_int, int ind);
+int reset_bit_double_decimal(s21_double_decimal* value, int num_int, int ind);
+int get_bit_int(int number, int ind);
+int set_bit_int(int* number, int ind);
+int reset_bit_int(int* number, int ind);
+int get_bit_arr_int(int* value, int num_int, int ind);
+int set_bit_arr_int(int* value, int num_int, int ind);
+int reset_bit_arr_int(int* value, int num_int, int ind);
 int get_width_number_in_bit(int* ints, int count_int);
-
 // ФУНКЦИИ ВЫВОДА 
 void print_decimal(s21_decimal value);
 void print_arr_int(int* value, int count_int);
@@ -42,51 +47,72 @@ void print_binary_int(int number);
 
 
 int main() {
-    s21_decimal a = {{0, 0, 0,  5 << 16}};
-    s21_decimal b = {{0, 0, 0,  9 << 16}};
+    // 5 << 16
+    s21_decimal a = {{0, 0, 0,  1 << 31}};
+    s21_decimal b = {{0, 0, 0,  1 << 31}};
     s21_decimal c = {{0, 0, 0,  0}};
-    a.bits[0] = 20323;
-    // a.bits[1] = 2;
-    b.bits[0] = 2342;
-    // b.bits[1] = 2193132120;
-    // a.bits[2] = 2193132120;
-    // b.bits[0] = 234313212;
-    // print_decimal(a);
-    // print_decimal(b);
-    sub_arr_int(a.bits, b.bits, c.bits, 3);
-    // s21_mul(a, b, &c);
+    a.bits[0] = 12;
+    b.bits[0] = 41;
+    print_decimal(a);
+    printf("sign = %u\n", get_sign(a));
+    return 0;
+    s21_add(a, b, &c);
+    // s21_div(a, b, &c);
+    // s21_mod(a, b, &c);
     print_decimal(a);
     print_decimal(b);
     print_decimal(c);
-    // printf("%u\n", left_shift_arr_int(a.bits, 3, 82));
-    // print_decimal(a);
     printf("%u\n", c.bits[0]);
-    // printf("%u\n", a.bits[0] - b.bits[0]);
-    
+    printf("%u\n", get_exponent(c));
+    printf("%u\n", get_sign(c));
+    // get_bit_decimal
+
+    // printf("%u\n", a.bits[0] + b.bits[0]);
+
     return 0;
 }
 
+int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
+    bool transfer_bit = false;
+    int sign_1 = get_sign(value_1);
+    int sign_2 = get_sign(value_2);
+    int exp_1 = get_exponent(value_1);
+    int exp_2 = get_exponent(value_2);
+    int exp = exp_1 > exp_2 ? exp_1 : exp_2;
 
-int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-    s21_decimal val_1 = {0,};
-    s21_decimal val_2 = {0,};
-    s21_double_decimal res = {0,};
-
-
-
-}
-
-// дополнительный код
-void convert_decimal_to_twos_complement(s21_decimal value, s21_decimal *result) {
-    convert_decimal_to_ones_complement(value, result);
-    s21_add(*result, (s21_decimal){{1, 0, 0, 0}}, result);
-}
-
-// обратный код
-void convert_decimal_to_ones_complement(s21_decimal value, s21_decimal *result) {
-    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-        result->bits[i] = ~(value.bits[i]);
+    // Приведение степеней
+    for (int i = exp_1; i < exp_2; i++) {
+        s21_mul(value_1, (s21_decimal){{10, 0, 0, 0}}, &value_1);
     }
+    for (int i = exp_2; i < exp_1; i++) {
+        s21_mul(value_2, (s21_decimal){{10, 0, 0, 0}}, &value_2);
+    }
+
+    if (sign_1 == sign_2) {
+        for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+            transfer_bit = sum_ints(value_1.bits[i], value_2.bits[i], &(result->bits[i]), transfer_bit);
+        }
+        printf("sign = %u\n", sign_1);
+        set_sign(result, sign_1);
+        set_exponent(result, exp);
+    } else {
+        if (sign_1) {
+            s21_sub(value_2, value_1, result);
+        }
+        if (sign_2) {
+            s21_sub(value_1, value_2, result);
+        }
+
+    }
+
+    
+
+    return transfer_bit;
+}
+
+int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    convert_decimal_to_twos_complement(value_2, &value_2);
+    return s21_add(value_1, value_2, result);
 }
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
@@ -116,6 +142,152 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
  
 }
 
+int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    s21_decimal remainder = {0,};
+    bool status = s21_div_with_remainder(value_1, value_2, result, &remainder);
+    if (!status) {
+        s21_decimal fraction = {0,};
+        int count = get_width_number_in_bit(remainder.bits, INTS_IN_DECIMAL);
+        for (int i = 0; i < (INTS_IN_DECIMAL * BITS_IN_INT - count); i++) {
+            left_shift_decimal_ints(&remainder);
+        }
+        s21_div_with_remainder(remainder, value_2, &fraction, &(s21_decimal){{0,}});
+        print_decimal(fraction);
+        printf("%u\n", fraction.bits[2]);
+    }
+    print_decimal(remainder);
+    printf("%u\n", remainder.bits[0]);
+    return status;
+}
+
+int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+    s21_decimal quotient = {0,};
+    s21_div_with_remainder(value_1, value_2, &quotient, result);
+    return 1;
+}
+
+
+
+int s21_div_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder) {
+    int status = 0;
+    if (!s21_is_zero_decimal(divisor)) {
+        s21_decimal tmp = {0,};
+        for (int num_int = INTS_IN_DECIMAL - 1; num_int >= 0; num_int--) {
+            for (int num_bit = BITS_IN_INT - 1; num_bit >= 0; num_bit--) {
+                // сдвиг уменьшаемого числа влево на один разряд
+                bool state_bit = get_bit_decimal(dividend, num_int, num_bit);
+                left_shift_decimal_ints(&tmp);
+                // перенос бита в нулевую позицию сдвинутого числа
+                if (state_bit) {
+                    set_bit_decimal(&tmp, 0, 0);
+                }
+                // вычисление остатка
+                if (s21_is_greater(tmp, divisor)) {
+                    // остататок > 0
+                    s21_sub(tmp, divisor, &tmp);
+                    set_bit_decimal(quotient, num_int, num_bit);
+                } else if (s21_is_equal(tmp, divisor)) {
+                    // остататок = 0
+                    decimal_clear(&tmp);
+                    set_bit_decimal(quotient, num_int, num_bit);
+                }
+            }
+        }
+        s21_copy_decimal(tmp, remainder);
+    } else {
+        status = 3;
+    }
+    return status;
+}
+
+void s21_copy_decimal(s21_decimal src, s21_decimal* dst) {
+    for (int i = 0; i < (INTS_IN_DECIMAL + 1); i++) {
+        dst->bits[i] = src.bits[i];
+    }
+}
+
+bool s21_is_zero_decimal(s21_decimal value) {
+    bool zero = true;
+    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        if (value.bits[i]) {
+            zero = false;
+            break;
+        }
+    }
+    return zero;
+}
+
+void decimal_clear(s21_decimal* value) {
+    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        value->bits[i] = 0;
+    }
+}
+
+// дополнительный код
+void convert_decimal_to_twos_complement(s21_decimal value, s21_decimal *result) {
+    convert_decimal_to_ones_complement(value, result);
+    s21_add(*result, (s21_decimal){{1, 0, 0, 0}}, result);
+}
+
+// обратный код
+void convert_decimal_to_ones_complement(s21_decimal value, s21_decimal *result) {
+    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        result->bits[i] = ~(value.bits[i]);
+    }
+}
+
+
+// <
+int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
+    bool less = true;
+    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        if (value_1.bits[i] > value_2.bits[i]) {
+            less = false;
+            break;
+        } else if (value_1.bits[i] < value_2.bits[i]) {
+            less = true;
+            break;
+        }
+    }
+    return less;
+}
+
+// >
+int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
+    bool less = false;
+    for (int i = INTS_IN_DECIMAL - 1; i >= 0; i--) {
+        if ((unsigned)(value_1.bits[i]) < (unsigned)(value_2.bits[i])) {
+            less = false;
+            break;
+        } else if ((unsigned)(value_1.bits[i]) > (unsigned)(value_2.bits[i])) {
+            less = true;
+            break;
+        }
+    }
+    return less;
+}
+
+// ==
+int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
+    bool equal = true;
+    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        if (value_1.bits[i] != value_2.bits[i]) {
+            equal = false;
+            break;
+        }
+    }
+    return equal;
+}
+
+// !=
+int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
+    return !s21_is_equal(value_1, value_2);
+}
+
+bool left_shift_decimal_ints(s21_decimal* value) {
+    return left_shift_one_arr_int(value->bits, INTS_IN_DECIMAL);
+}
+
 bool left_shift_arr_int(int* ints, int num_int, unsigned int offset) {
     bool transfer_bit = false;
     for (unsigned int i = 0; i < offset; i++) {
@@ -142,6 +314,8 @@ bool copy_arr_ints(int* src, int* dst, int count_int_src) {
     return true;
 }
 
+
+
 int get_sum_exponent(s21_decimal value_1, s21_decimal value_2) {
     int exp_1 = get_exponent(value_1);
     int exp_2 = get_exponent(value_2);
@@ -160,7 +334,7 @@ void set_exponent(s21_decimal* value, int exp) {
 }
 
 int get_sign(s21_decimal value) {
-    return get_bit_decimal(value, INTS_IN_DECIMAL, BIT_SIGN);
+    return get_bit_decimal(value, INTS_IN_DECIMAL, BIT_SIGN - 1);
 }
 
 void set_sign(s21_decimal* value, int sign) {
@@ -184,18 +358,8 @@ int sub_arr_int(int* value_1, int* value_2, int* result, int count_int) {
 }
 
 
-// // 
-// int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-// }
 
 // ФУНКЦИИ СЛОЖЕНИЯ
-int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
-    bool transfer_bit = false;
-    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-        transfer_bit = sum_ints(value_1.bits[i], value_2.bits[i], &(result->bits[i]), transfer_bit);
-    }
-    return transfer_bit;
-}
 
 bool sum_arr_int(int* value_1, int* value_2, int* result, int count_int) {
     bool transfer_bit = false;
@@ -227,44 +391,58 @@ bool sum_ints(int value_1, int value_2, int* result, bool transfer_bit) {
 
 
 // РАБОТА С БИТАМИ - нумерация с нуля
-bool get_bit_decimal(s21_decimal value, int num_int, int ind) { 
-    return value.bits[num_int] & (1 << ind);
+int get_bit_decimal(s21_decimal value, int num_int, int ind) { 
+    return (value.bits[num_int] >> ind) & 1 ;
 }
 
-bool set_bit_decimal(s21_decimal* value, int num_int, int ind) {    
+int set_bit_decimal(s21_decimal* value, int num_int, int ind) {    
     value->bits[num_int] |= 1 << ind;
     return true;
 }
 
-bool reset_bit_decimal(s21_decimal* value, int num_int, int ind) {
+int reset_bit_decimal(s21_decimal* value, int num_int, int ind) {
     value->bits[num_int] &= ~(1 << ind);
     return true;
 }
 
-bool get_bit_int(int number, int ind) { 
+int get_bit_double_decimal(s21_double_decimal value, int num_int, int ind) { 
+    return value.bits[num_int] & (1 << ind);
+}
+
+int set_bit_double_decimal(s21_double_decimal* value, int num_int, int ind) {    
+    value->bits[num_int] |= 1 << ind;
+    return true;
+}
+
+int reset_bit_double_decimal(s21_double_decimal* value, int num_int, int ind) {
+    value->bits[num_int] &= ~(1 << ind);
+    return true;
+}
+
+int get_bit_int(int number, int ind) { 
     return number & (1 << ind);
 }
 
-bool set_bit_int(int* number, int ind) {  
+int set_bit_int(int* number, int ind) {  
     *number |= 1 << ind;
     return true;
 }
 
-bool reset_bit_int(int* number, int ind) {  
+int reset_bit_int(int* number, int ind) {  
     *number &= ~(1 << ind);
     return true;
 }
 
-bool get_bit_arr_int(int* value, int num_int, int ind) { 
+int get_bit_arr_int(int* value, int num_int, int ind) { 
     return get_bit_int(value[num_int], ind);
 }
 
-bool set_bit_arr_int(int* value, int num_int, int ind) {
+int set_bit_arr_int(int* value, int num_int, int ind) {
     set_bit_int(&(value[num_int]), ind);
     return true;
 }
 
-bool reset_bit_arr_int(int* value, int num_int, int ind) {
+int reset_bit_arr_int(int* value, int num_int, int ind) {
     reset_bit_int(&(value[num_int]), ind);
     return true;
 }
@@ -280,6 +458,7 @@ int get_width_number_in_bit(int* ints, int count_int) {
     }
     return width;
 }
+
 
 
 // ФУНКЦИИ ВЫВОДА

@@ -1,3 +1,7 @@
+#pragma once
+#ifndef SRC_S21_DECIMAL_H_
+#define SRC_S21_DECIMAL_H_
+
 
 #define BITS_IN_INT 32          // кол-во бит в инте
 #define INTS_IN_DECIMAL 3       // кол-во INT хранящих значащее число
@@ -28,10 +32,10 @@ typedef enum CompareStatus {
     TRUE        // 1 - TRUE
 } CompareStatus;
 
-// typedef enum ConversionStatus {
-//     OK,         // 0 - OK
-//     ERR         // 1 - ошибка конвертации
-// } ConversionStatus;
+typedef enum ConversionStatus {
+    // OK,         // 0 - OK
+    ERR=1         // 1 - ошибка конвертации
+} ConversionStatus;
 
 // typedef enum CalcStatus {
 //     OK,         // 0 - OK
@@ -45,12 +49,12 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result);
 
-int s21_is_less(s21_decimal, s21_decimal);
-int s21_is_less_or_equal(s21_decimal, s21_decimal);
-int s21_is_greater(s21_decimal, s21_decimal);
-int s21_is_greater_or_equal(s21_decimal, s21_decimal);
-int s21_is_equal(s21_decimal, s21_decimal);
-int s21_is_not_equal(s21_decimal, s21_decimal);
+int s21_is_less(s21_decimal value_1, s21_decimal value_2);
+int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_greater(s21_decimal value_1, s21_decimal value_2);
+int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_equal(s21_decimal value_1, s21_decimal value_2);
+int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2);
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst);
 int s21_from_float_to_decimal(float src, s21_decimal *dst);
@@ -64,3 +68,4 @@ int s21_negate(s21_decimal value, s21_decimal *result);
 
 
 
+#endif  // SRC_S21_DECIMAL_H_
