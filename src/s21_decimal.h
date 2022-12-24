@@ -1,7 +1,7 @@
 
 #define BITS_IN_INT 32          // кол-во бит в инте
 #define INTS_IN_DECIMAL 3       // кол-во INT хранящих значащее число
-#define META_NUMBER_INT 3       // номер INT хранящий знак и порядок в decimal
+#define META_NUMBER_INT 4       // номер INT хранящий знак и порядок в decimal
 #define BIT_SIGN BITS_IN_INT    // номер бита знака в INT
 #define BIT_EXP_START 16        // номер бита с которого хранится экспонента
 #define BIT_EXP_END 23          // номер юита до которого хранится экспонента
@@ -9,8 +9,12 @@
 #define EXP_MIN 0               // минимальное значение экспоненты
 
 typedef struct {
-    int bits[4];
+    int bits[1 + INTS_IN_DECIMAL];
 } s21_decimal;
+
+typedef struct {
+    int bits[1 + 2 * INTS_IN_DECIMAL];
+} s21_double_decimal;
 
 typedef enum ArithmeticStatus {
     OK,         // 0 - OK

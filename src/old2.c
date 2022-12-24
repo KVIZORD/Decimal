@@ -19,8 +19,6 @@ void set_sign(s21_decimal* value, int sign);
 int get_exponent(s21_decimal value);
 void set_exponent(s21_decimal* value, int exp);
 int get_sum_exponent(s21_decimal value_1, s21_decimal value_2);
-void convert_decimal_to_ones_complement(s21_decimal value, s21_decimal *result);
-void convert_decimal_to_twos_complement(s21_decimal value, s21_decimal *result);
 
 // РАБОТА С БИТАМИ - нумерация с нуля
 bool get_bit_decimal(s21_decimal value, int num_int, int ind);
@@ -67,27 +65,32 @@ int main() {
 }
 
 
-int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-    s21_decimal val_1 = {0,};
-    s21_decimal val_2 = {0,};
-    s21_double_decimal res = {0,};
-
-
-
-}
-
-// дополнительный код
-void convert_decimal_to_twos_complement(s21_decimal value, s21_decimal *result) {
-    convert_decimal_to_ones_complement(value, result);
-    s21_add(*result, (s21_decimal){{1, 0, 0, 0}}, result);
-}
-
-// обратный код
-void convert_decimal_to_ones_complement(s21_decimal value, s21_decimal *result) {
-    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-        result->bits[i] = ~(value.bits[i]);
-    }
-}
+// int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+//     int status = 0;
+//     int offset_value[3] = {0, 0, 0};
+//     // Знак числа
+//     if (get_sign(value_1) != get_sign(value_2)) {
+//         set_sign(result, 1);
+//     }
+//     // Степень числа
+//     int exp = get_sum_exponent(value_1, value_2);
+//     if (exp > EXP_MAX) {
+//         status = INF_NEGAT;
+//     } else {
+//         set_exponent(result, exp);
+//     }
+//     // Умножение числа
+//     // copy_ints(value_1.bits, offset_value);
+//     for (int i = 0; i < INTS_IN_DECIMAL && status == OK; i++) {
+//         for (int j = 0; j <= BITS_IN_INT; j++) {
+//             if (get_bit_int(value_2.bits[i], j)) {
+//                 sum_arr_ints(result->bits, offset_value, result->bits);
+//             }
+//             left_shift_ints(offset_value, 1);
+//         }
+//     }
+//     return status;
+// }
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int status = 0;
@@ -150,13 +153,13 @@ int get_sum_exponent(s21_decimal value_1, s21_decimal value_2) {
 }
 
 int get_exponent(s21_decimal value) {
-    return (value.bits[META_NUMBER_INT - 1] << (BITS_IN_INT - 1 - BIT_EXP_END)) >> (BITS_IN_INT - 1 - BIT_EXP_END + BIT_EXP_START);
+    return (value.bits[NUMBER_INT_META] << (BITS_IN_INT - 1 - BIT_EXP_END)) >> (BITS_IN_INT - 1 - BIT_EXP_END + BIT_EXP_START);
 }
 
 void set_exponent(s21_decimal* value, int exp) {
     int i = 0;
-    value->bits[META_NUMBER_INT - 1] &= ~((~i) << (BITS_IN_INT - 1 - BIT_EXP_END)) >> (BITS_IN_INT - 1 - BIT_EXP_END + BIT_EXP_START);
-    value->bits[META_NUMBER_INT - 1] |= exp << BIT_EXP_START;
+    value->bits[NUMBER_INT_META] &= ~((~i) << (BITS_IN_INT - 1 - BIT_EXP_END)) >> (BITS_IN_INT - 1 - BIT_EXP_END + BIT_EXP_START);
+    value->bits[NUMBER_INT_META] |= exp << BIT_EXP_START;
 }
 
 int get_sign(s21_decimal value) {
@@ -171,6 +174,7 @@ void set_sign(s21_decimal* value, int sign) {
     }
 }
 
+
 int sub_arr_int(int* value_1, int* value_2, int* result, int count_int) {
   for (int i = 0; i < count_int; i++) {
     value_2[i] = ~(value_2[i]);
@@ -183,10 +187,6 @@ int sub_arr_int(int* value_1, int* value_2, int* result, int count_int) {
   return transfer_bit;
 }
 
-
-// // 
-// int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-// }
 
 // ФУНКЦИИ СЛОЖЕНИЯ
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {

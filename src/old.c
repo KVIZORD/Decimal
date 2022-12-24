@@ -111,13 +111,13 @@ int get_sum_exponent(s21_decimal value_1, s21_decimal value_2) {
 }
 
 int get_exponent(s21_decimal value) {
-    return (value.bits[META_NUMBER_INT] << (BITS_IN_INT - BIT_EXP_END)) >> (BITS_IN_INT - BIT_EXP_END + BIT_EXP_START);
+    return (value.bits[NUMBER_INT_META] << (BITS_IN_INT - BIT_EXP_END)) >> (BITS_IN_INT - BIT_EXP_END + BIT_EXP_START);
 }
 
 void set_exponent(s21_decimal* value, int exp) {
     int i = 0;
-    value->bits[META_NUMBER_INT] &= ~((~i) << (BITS_IN_INT - BIT_EXP_END)) >> (BITS_IN_INT - BIT_EXP_END + BIT_EXP_START);
-    value->bits[META_NUMBER_INT] |= exp << BIT_EXP_START;
+    value->bits[NUMBER_INT_META] &= ~((~i) << (BITS_IN_INT - BIT_EXP_END)) >> (BITS_IN_INT - BIT_EXP_END + BIT_EXP_START);
+    value->bits[NUMBER_INT_META] |= exp << BIT_EXP_START;
 }
 
 int get_sign(s21_decimal value) {
