@@ -32,10 +32,10 @@ typedef enum CompareStatus {
     TRUE        // 1 - TRUE
 } CompareStatus;
 
-typedef enum ConversionStatus {
-    // OK,         // 0 - OK
-    ERR=1         // 1 - ошибка конвертации
-} ConversionStatus;
+typedef enum Status {
+    STATUS_OK,          // 0 - OK
+    STATUS_ERR          // 1 - ошибка
+} Status;
 
 // typedef enum CalcStatus {
 //     OK,         // 0 - OK
