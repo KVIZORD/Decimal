@@ -1,7 +1,8 @@
 #pragma once
 #ifndef SRC_S21_DECIMAL_H_
 #define SRC_S21_DECIMAL_H_
-
+// #include "common/bit_operations.h"
+// #include "common/print.h"
 
 #define BITS_IN_INT 32          // кол-во бит в инте
 #define INTS_IN_DECIMAL 3       // кол-во INT хранящих значащее число
