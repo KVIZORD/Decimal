@@ -23,7 +23,7 @@ endif
 all: clean $(MAIN_FILE).a test gcov_report
 
 decimal:
-	$(CC) $(CFLAGS) -o $(MAIN_FILE) $(MAIN_FILE).c common/data.c common/print.c common/bits.c common/shift.c common/common.c common/converting.c $(LIBS)
+	$(CC) $(CFLAGS) -o $(MAIN_FILE) $(MAIN_FILE).c common/*.c $(LIBS)
 	./$(MAIN_FILE)
 
 $(MAIN_FILE).o: $(MAIN_FILE).c $(MAIN_FILE).h 

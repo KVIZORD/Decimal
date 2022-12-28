@@ -1,5 +1,6 @@
 #include "services.h"
 
+
 int s21_div_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder) {
     int status = 0;
     if (!s21_is_zero_decimal(divisor)) {
@@ -32,12 +33,6 @@ int s21_div_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decima
     return status;
 }
 
-void s21_copy_decimal(s21_decimal src, s21_decimal* dst) {
-    for (int i = 0; i <= INTS_IN_DECIMAL; i++) {
-        dst->bits[i] = src.bits[i];
-    }
-}
-
 bool s21_is_zero_decimal(s21_decimal value) {
     bool zero = true;
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
@@ -53,13 +48,6 @@ void decimal_clear(s21_decimal* value) {
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
         value->bits[i] = 0;
     }
-}
-
-bool copy_arr_ints(int* src, int* dst, int count_int_src) {
-    for (int i = 0; i < count_int_src; i++) {
-        dst[i] = src[i];
-    }
-    return true;
 }
 
 int sub_arr_int(int* value_1, int* value_2, int* result, int count_int) {
@@ -82,7 +70,6 @@ bool sum_arr_int(int* value_1, int* value_2, int* result, int count_int) {
     return transfer_bit;
 }
 
-
 // ++-
 bool sum_ints(int value_1, int value_2, int* result, bool transfer_bit) {
     // побитовое сложение
@@ -104,17 +91,15 @@ bool sum_ints(int value_1, int value_2, int* result, bool transfer_bit) {
     return transfer_bit;
 }
 
-
-
 // +++
 int s21_sum(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
     bool transfer_bit = false;
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
         transfer_bit = sum_ints(value_1.bits[i], value_2.bits[i], &(result->bits[i]), transfer_bit);
     }
-    int exp = get_exponent(value_1);
-    set_sign(result, get_sign(value_1));
-    set_exponent(result, exp);
+    int exp = get_exponent_decimal(value_1);
+    set_sign_decimal(result, get_sign_decimal(value_1));
+    set_exponent_decimal(result, exp);
     
     return transfer_bit;
 }

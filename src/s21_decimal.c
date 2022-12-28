@@ -18,10 +18,10 @@ void decimal_clear(s21_decimal* value);
 void round_banking(s21_decimal* value, bool right_bit);
 
 int s21_sum(s21_decimal value_1, s21_decimal value_2, s21_decimal* result);
-// int get_sign(s21_decimal value);
-// void set_sign(s21_decimal* value, int sign);
-// int get_exponent(s21_decimal value);
-// void set_exponent(s21_decimal* value, int exp);
+// int get_sign_decimal(s21_decimal value);
+// void set_sign_decimal(s21_decimal* value, int sign);
+// int get_exponent_decimal(s21_decimal value);
+// void set_exponent_decimal(s21_decimal* value, int exp);
 // int get_sum_exponent(s21_decimal value_1, s21_decimal value_2);
 void convert_decimal_to_ones_complement(s21_decimal* value);
 void convert_decimal_to_twos_complement(s21_decimal* value);
@@ -29,6 +29,7 @@ void convert_decimal_to_twos_complement(s21_decimal* value);
 
 int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
 
+// 1.3292279165568E+36
 // +29710560942849126597578981375*10^(-3)
 // +49517601571415210995964968959*10^(-3)
 // +79228162514264337593543950334*10^(-3)
@@ -40,13 +41,14 @@ int main() {
     s21_decimal c = {{0, 0, 0,  0}};
     a.bits[0] = 0xffffffff;
     a.bits[1] = 0xffffffff;
-    a.bits[2] = 0xfffffff0;
+    a.bits[2] = 0xffffffff;
     // a.bits[2] = 0xfffffff;
-    b.bits[0] = 0xffffffff;
-    b.bits[1] = 0xffffffff;
-    b.bits[2] = 0x0fffffff;
+    // b.bits[0] = 10;
+    b.bits[0] = 0xffffff;
+    // b.bits[1] = 0xffffffff;
+    // b.bits[2] = 0xffffffff;
     // normalization_decimal(&a, &b);
-    s21_add(a, b, &c);
+    s21_mul(a, b, &c);
     // convert_decimal_to_twos_complement(&a);
     // printf("%u\n", right_shift_decimal(&a, 1));
     print_decimal(a);
@@ -55,10 +57,10 @@ int main() {
     print_decimal_in_dec(a);
     print_decimal_in_dec(b);
     print_decimal_in_dec(c);
-    // printf("%u\n", get_exponent(a));
-    // printf("%u\n", get_exponent(b));
-    // printf("%u\n", get_exponent(c));
-    // printf("sign = %u\n", get_sign(a));
+    // printf("%u\n", get_exponent_decimal(a));
+    // printf("%u\n", get_exponent_decimal(b));
+    // printf("%u\n", get_exponent_decimal(c));
+    // printf("sign = %u\n", get_sign_decimal(a));
     // return 0;
     // s21_mul(a, b, &c);
     // s21_div(a, b, &c);
@@ -67,8 +69,8 @@ int main() {
     // print_decimal(b);
     // shift_point(&a, 29);
     // printf("%u\n", a.bits[0]);
-    // printf("%u\n", get_exponent(a));
-    // printf("%u\n", get_sign(c));
+    // printf("%u\n", get_exponent_decimal(a));
+    // printf("%u\n", get_sign_decimal(c));
     // get_bit_decimal
 
     // printf("%u\n", a.bits[0] + b.bits[0]);
@@ -81,12 +83,12 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
     ArithmeticStatus status = OK;
     Status status_ = normalization_decimal(&value_1, &value_2);
     if (status_ == STATUS_OK) {
-        int sign_2 = get_sign(value_2);
-        int sign_1 = get_sign(value_1);
-        int exp = get_exponent(value_1);
+        int sign_2 = get_sign_decimal(value_2);
+        int sign_1 = get_sign_decimal(value_1);
+        int exp = get_exponent_decimal(value_1);
         if (sign_1 == sign_2) {
-            set_sign(result, sign_1);
-            set_exponent(result, exp);
+            set_sign_decimal(result, sign_1);
+            set_exponent_decimal(result, exp);
             bool transfer_bit = s21_sum(value_1, value_2, result);
             // если случилось переполнение и степень больше нуля
             if (transfer_bit && exp >= 1) {
@@ -94,7 +96,7 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
                 bool right_bit = right_shift_decimal(result, true);    // сдвиг вправо - т.е. деление на 2
                 round_banking(result, right_bit);
                 s21_div(*result, (s21_decimal){{1, 0, 0, 0}}, result);      // деление на 5
-                set_exponent(result, exp - 1);                              // уменьшение степени
+                set_exponent_decimal(result, exp - 1);                              // уменьшение степени
             }
         } else if (sign_1) {
             status = s21_sub(value_2, value_1, result);
@@ -109,19 +111,19 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     ArithmeticStatus status = OK;
     Status status_ = normalization_decimal(&value_1, &value_2);
     if (status_ == STATUS_OK) {
-        int sign_2 = get_sign(value_2);
-        int sign_1 = get_sign(value_1);
-        int exp = get_exponent(value_1);
+        int sign_2 = get_sign_decimal(value_2);
+        int sign_1 = get_sign_decimal(value_1);
+        int exp = get_exponent_decimal(value_1);
         if (sign_1 == sign_2) {
-            set_sign(result, sign_1);
-            set_exponent(result, exp);
+            set_sign_decimal(result, sign_1);
+            set_exponent_decimal(result, exp);
             convert_decimal_to_twos_complement(&value_2);
             status = s21_sum(value_1, value_2, result);
         } else if (sign_1) {
-            set_sign(&value_2, true);
+            set_sign_decimal(&value_2, true);
             status = s21_add(value_1, value_2, result);
         } else if (sign_2) {
-            set_sign(&value_2, false);
+            set_sign_decimal(&value_2, false);
             status = s21_add(value_1, value_2, result);
         }
     }
@@ -130,26 +132,34 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 
 int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int status = 0;
-    int exp_1 = get_exponent(value_1);
-    int exp_2 = get_exponent(value_2);
+    int exp_1 = get_exponent_decimal(value_1);
+    int exp_2 = get_exponent_decimal(value_2);
     // printf("exp_1 + exp_2 = %d\n", exp_1 + exp_2);
     // bool transfer_bit = false;
-    int multiplier[2 * INTS_IN_DECIMAL] = {0, };
-    int subtotal[2 * INTS_IN_DECIMAL] = {0, };
-    copy_arr_ints(value_1.bits, multiplier, INTS_IN_DECIMAL);
+    // int multiplier[2 * INTS_IN_DECIMAL] = {0, };
+    // int subtotal[2 * INTS_IN_DECIMAL] = {0, };
+    // copy_arr_ints(value_1.bits, multiplier, INTS_IN_DECIMAL);
+    s21_double_decimal multiplier = {0,};
+    s21_double_decimal subtotal = {0,};
+    convert_decimal_to_double_decimal(value_1, &multiplier);
 
 
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
         for (int j = 0; j < BITS_IN_INT; j++) {
             if (get_bit_int(value_2.bits[i], j)) {
-                sum_arr_int(subtotal, multiplier, subtotal, 2 * INTS_IN_DECIMAL);
+                // sum_arr_int(subtotal, multiplier, subtotal, 2 * INTS_IN_DECIMAL);
+                sum_arr_int(subtotal.bits, multiplier.bits, subtotal.bits, 2 * INTS_IN_DECIMAL);
             }
-            left_shift_one_arr_int(multiplier, 2 * INTS_IN_DECIMAL);
+            // left_shift_one_arr_int(multiplier, 2 * INTS_IN_DECIMAL);
+            left_shift_one_arr_int(multiplier.bits, 2 * INTS_IN_DECIMAL);
         }
     }
 
-    copy_arr_ints(subtotal, result->bits, INTS_IN_DECIMAL);
-    set_exponent(result, exp_1 + exp_2);
+    // print_double_decimal(subtotal);
+    // print_double_decimal_in_dec(subtotal);
+    // copy_arr_ints(subtotal, result->bits, INTS_IN_DECIMAL);
+    set_exponent_decimal(result, exp_1 + exp_2);
+    double_decimal_to_decimal(subtotal, result);
     // int count_bit = get_width_number_in_bit(subtotal, 2 * INTS_IN_DECIMAL);
     // printf("=> %d\n", count_bit);
     // print_arr_int(subtotal, 4);
@@ -157,9 +167,9 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     //     printf("=> %d\n", count_bit);
     // }
     // printf("get_width_number_in_bit(subtotal, INTS_IN_DECIMAL) = %d\n", get_width_number_in_bit(subtotal, INTS_IN_DECIMAL));
-    if (get_width_number_in_bit(subtotal, 2 * INTS_IN_DECIMAL) > (INTS_IN_DECIMAL * BITS_IN_INT)) {
-        status = 1;
-    }
+    // if (get_width_number_in_bit(subtotal, 2 * INTS_IN_DECIMAL) > (INTS_IN_DECIMAL * BITS_IN_INT)) {
+    //     status = 1;
+    // }
     return status;
  
 }
@@ -234,3 +244,16 @@ int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
     return !s21_is_equal(value_1, value_2);
 }
+// 79228162237563176487900676095
+// * 15
+// 1.1884224335634E+30
+// 1.1884224335634E+30
+
+
+//   7.9228162514264 E+28
+// * 1.8446744073710 E+19
+//   1.4615016373309 E+48
+
+//   7.9228162514264 E+28
+// * 7.9228162514264 E+28
+//   6.2771017353867 E+57

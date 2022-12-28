@@ -26,7 +26,7 @@ bool left_shift_one_arr_int(int* ints, int num_int) {
 
 void shift_point(s21_decimal* value, int exp) {
     s21_decimal tmp = {{0, 0, 0, 0}};
-    int exp_old = get_exponent(*value);
+    int exp_old = get_exponent_decimal(*value);
     int exp_new = exp_old;
     for (int i = exp_old; i < exp; i++) {
         bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
@@ -45,7 +45,7 @@ void shift_point(s21_decimal* value, int exp) {
         exp_new -= 1;
         s21_copy_decimal(tmp, value);
     }
-    set_exponent(value, exp_new);
+    set_exponent_decimal(value, exp_new);
 }
 
 bool right_shift_decimal(s21_decimal* value, bool left_bit) {
@@ -67,5 +67,4 @@ bool right_shift_decimal(s21_decimal* value, bool left_bit) {
     }
     return transfer_bit;
 }
-
 

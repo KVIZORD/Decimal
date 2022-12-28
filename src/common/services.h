@@ -17,17 +17,23 @@ bool sum_ints(int value_1, int value_2, int* result, bool transfer_bit);
 int s21_sum(s21_decimal value_1, s21_decimal value_2, s21_decimal* result);
 
 // ФУНКЦИИ КОНВЕРТАЦИИ
+int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
 void round_banking(s21_decimal* value, bool right_bit);
 void convert_decimal_to_twos_complement(s21_decimal *value);
 void convert_decimal_to_ones_complement(s21_decimal* value);
-int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
+void convert_decimal_to_double_decimal(s21_decimal src, s21_double_decimal* dst);
+void double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst);
 
 // ФУНКЦИИ ДЛЯ РАБОТЫ С ЗНАКОМ И ЭКСПОНЕНТОЙ - DECIMAL
 int get_sum_exponent(s21_decimal value_1, s21_decimal value_2);
-int get_exponent(s21_decimal value);
-void set_exponent(s21_decimal* value, int exp);
-int get_sign(s21_decimal value);
-void set_sign(s21_decimal* value, int sign);
+int get_exponent_decimal(s21_decimal value);
+void set_exponent_decimal(s21_decimal* value, int exp);
+int get_sign_decimal(s21_decimal value);
+void set_sign_decimal(s21_decimal* value, int sign);
+int get_exponent_double_decimal(s21_double_decimal value);
+void set_exponent_double_decimal(s21_double_decimal* value, int exp);
+int get_sign_double_decimal(s21_double_decimal value);
+void set_sign_double_decimal(s21_double_decimal* value, int sign);
 
 // ФУНКЦИИ РАБОТЫ С БИТАМИ - DECIMAL
 int get_bit_decimal(s21_decimal value, int num_int, int ind);
@@ -62,6 +68,9 @@ void print_decimal(s21_decimal value);
 void print_arr_int(int* value, int count_int);
 void print_binary_int(int number);
 void print_decimal_in_dec(s21_decimal value);
-__int128_t decimal_to_int128(s21_decimal value);
+__uint128_t decimal_to_int128(s21_decimal value);
+void print_double_decimal(s21_double_decimal value);
+void print_double_decimal_in_dec(s21_double_decimal value);
+__uint128_t double_decimal_to_int128(s21_double_decimal value);
 
 #endif  // SRC_COMMON_SERVICES_H_
