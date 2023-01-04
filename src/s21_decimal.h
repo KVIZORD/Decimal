@@ -3,15 +3,16 @@
 #define SRC_S21_DECIMAL_H_
 // #include "common/bit_operations.h"
 // #include "common/print.h"
+#include <stdbool.h>
 
-#define BITS_IN_INT 32          // кол-во бит в инте
-#define INTS_IN_DECIMAL 3       // кол-во INT хранящих значащее число
-#define META_NUMBER_INT 4       // номер INT хранящий знак и порядок в decimal
-#define BIT_SIGN BITS_IN_INT    // номер бита знака в INT
-#define BIT_EXP_START 16        // номер бита с которого хранится экспонента
-#define BIT_EXP_END 23          // номер юита до которого хранится экспонента
-#define EXP_MAX 28              // максимальное значение экспоненты
-#define EXP_MIN 0               // минимальное значение экспоненты
+#define BITS_IN_INT 32              // кол-во бит в инте
+#define INTS_IN_DECIMAL 3           // кол-во INT хранящих значащее число
+#define META_NUMBER_INT 4           // номер INT хранящий знак и порядок в decimal
+#define BIT_SIGN (BITS_IN_INT - 1)  // номер бита знака в INT
+#define BIT_EXP_START 16            // индекс бита в INT с которого хранится экспонента
+#define BIT_EXP_END 23              // индекс бита в INT до которого хранится экспонента
+#define EXP_MAX 28                  // максимальное значение экспоненты
+#define EXP_MIN 0                   // минимальное значение экспоненты
 
 typedef struct {
     int bits[1 + INTS_IN_DECIMAL];

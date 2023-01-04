@@ -1,70 +1,84 @@
-#include "services.h"
+#include "common.h"
 
 
-bool left_shift_decimal_ints(s21_decimal* value) {
-    return left_shift_one_arr_int(value->bits, INTS_IN_DECIMAL);
+int left_shift_decimal(s21_decimal* value) {
+    return left_shift_ints(value->bits, INTS_IN_DECIMAL);
 }
 
-bool left_shift_arr_int(int* ints, int num_int, unsigned int offset) {
-    bool transfer_bit = false;
-    for (unsigned int i = 0; i < offset; i++) {
-       transfer_bit = left_shift_one_arr_int(ints, num_int) ? true : transfer_bit;
-    }
-    return transfer_bit;
+int left_shift_double_decimal(s21_double_decimal* value) {
+    return left_shift_ints(value->bits, 2 * INTS_IN_DECIMAL);
 }
 
-bool left_shift_one_arr_int(int* ints, int num_int) {
+int left_shift_ints(int* ints, int num_int) {
     bool transfer_bit = get_bit_int(ints[num_int - 1], BITS_IN_INT - 1);
     for (int i = num_int - 1; i >= 0; i--) {
         ints[i] <<= 1;
-        if (i > 0) {
-            ints[i] |= ((ints[i - 1] >> (BITS_IN_INT - 1)) & 1);
+        int bit = (i > 0) ? get_bit_int(ints[i - 1], BITS_IN_INT - 1) : 0;
+        if (bit) {
+            set_bit_int(&(ints[i]), 0);
+        } else {
+            reset_bit_int(&(ints[i]), 0);
         }
     }
     return transfer_bit;
 }
 
-void shift_point(s21_decimal* value, int exp) {
-    s21_decimal tmp = {{0, 0, 0, 0}};
-    int exp_old = get_exponent_decimal(*value);
-    int exp_new = exp_old;
-    for (int i = exp_old; i < exp; i++) {
-        bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        if (status) {
-            break;
-        }
-        exp_new += 1;
-        s21_copy_decimal(tmp, value);
-    }
-    for (int i = exp; i < exp_old; i++) {
-        bool status = s21_div(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        s21_copy_decimal(tmp, value);
-        if (status) {
-            break;
-        }
-        exp_new -= 1;
-        s21_copy_decimal(tmp, value);
-    }
-    set_exponent_decimal(value, exp_new);
+int right_shift_decimal(s21_decimal* value) {
+    return right_shift_ints(value->bits, INTS_IN_DECIMAL);
 }
 
-bool right_shift_decimal(s21_decimal* value, bool left_bit) {
-    bool transfer_bit = get_bit_int((value->bits)[0], 0);
-    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-        value->bits[i] >>= 1;
-        if (i < (INTS_IN_DECIMAL - 1)) {
-            if (get_bit_decimal(*value, i + 1, 0)) {
-                set_bit_decimal(value, i, BITS_IN_INT - 1);
-            } else {
-                reset_bit_decimal(value, i, BITS_IN_INT - 1);
-            }
+int right_shift_double_decimal(s21_double_decimal* value) {
+    return right_shift_ints(value->bits, 2 * INTS_IN_DECIMAL);
+}
+
+int right_shift_ints(int* ints, int num_int) {
+    bool right_bit = get_bit_int(ints[0], 0);
+    for (int i = 0; i < num_int; i++) {
+        ints[i] >>= 1;
+        int bit = (i < num_int - 1) ? get_bit_int(ints[i + 1], 0) : 0;
+        if (bit) {
+            set_bit_int(&(ints[i]), BITS_IN_INT - 1);
+        } else {
+            reset_bit_int(&(ints[i]), BITS_IN_INT - 1);
         }
     }
-    if (left_bit) {
-        set_bit_decimal(value, INTS_IN_DECIMAL - 1, BITS_IN_INT - 1);
-    } else {
-        reset_bit_decimal(value, INTS_IN_DECIMAL - 1, BITS_IN_INT - 1);
-    }
-    return transfer_bit;
+    return right_bit;
 }
+
+// int right_shift_ints(int* ints, int num_int) {
+//     bool right_bit = get_bit_int(ints[0], 0);
+//     for (int i = 0; i < num_int; i++) {
+//         ints[i] >>= 1;
+//         int bit = (i < num_int - 1) ? get_bit_int(ints[i + 1], 0) : 0;
+//         if (bit) {
+//             set_bit_int(&(ints[i]), BITS_IN_INT - 1);
+//         } else {
+//             reset_bit_int(&(ints[i]), BITS_IN_INT - 1);
+//         }
+//     }
+//     return right_bit;
+// }
+
+// 0.5 -> 0
+// 1.5 -> 2
+// 2.5 -> 2
+// 3.5 -> 4
+// 4.5 -> 4
+// 5.5 -> 6
+// 6.5 -> 6
+// 7.5 -> 8
+// 8.5 -> 8
+// 9.5 -> 10
+
+//    0.101 ->    0
+//    1.101 ->   10
+//   10.101 ->   10
+//   11.101 ->  100
+//  100.101 ->  100
+//  101.101 ->  110
+//  110.101 ->  110
+//  111.101 -> 1000
+// 1000.101 -> 1000
+// 1001.101 -> 1100
+
 
