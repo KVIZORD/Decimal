@@ -25,6 +25,7 @@ int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_de
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *result);
 int div_decimal_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal* result);
 void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new);
+// int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
 
 // converting.c
 void convert_decimal_to_twos_complement(s21_decimal *value);
@@ -55,6 +56,7 @@ int get_sign_decimal(s21_decimal value);
 int set_sign_decimal(s21_decimal* value, int sign);
 int get_sign_double_decimal(s21_double_decimal value);
 int set_sign_double_decimal(s21_double_decimal* value, int sign);
+void change_exp_decimal(s21_decimal* value, int exp);
 
 // shift.c
 int left_shift_decimal(s21_decimal* value);

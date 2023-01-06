@@ -3,22 +3,29 @@
 
 
 int main() {
-    s21_decimal a = {{0, 0, 0,  28 << 16}};
-    s21_decimal b = {{0, 0, 0,  2 << 16}};
+    s21_decimal a = {{0, 0, 0,  6 << 16}};
+    // s21_decimal b = {{0, 0, 0,  2 << 16}};
     s21_decimal c = {{0, 0, 0,  0}};
 
     a.bits[0] = 0xffffffff;
-    a.bits[1] = 0xffffffff;
-    a.bits[2] = 0xffffffff;
+    // set_bit_decimal(&a, INTS_IN_DECIMAL, BITS_IN_INT - 1);
+    // print_decimal(a);
+    // a.bits[1] = 0xffffffff;
+    // a.bits[2] = 0xffffffff;
 
-    b.bits[0] = 0xffffffff;
-    b.bits[1] = 0xffffffff;
+    // b.bits[0] = 0xffffffff;
+    // b.bits[1] = 0xffffffff;
     // b.bits[2] = 0xffffffff;
 
-    printf("resultt = %d\n", s21_mul(a, b, &c));
+    // print_decimal_in_dec(a);
+    // s21_round(a, &c);
+    // s21_truncate(a, &c);
+    s21_floor(a, &c);
+
+    // printf("resultt = %d\n", s21_mul(a, b, &c));
     
     print_decimal_in_dec(a);
-    print_decimal_in_dec(b);
+    // print_decimal_in_dec(b);
     print_decimal_in_dec(c);
 
     return 0;
@@ -120,6 +127,7 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 }
 
 
+// Сравнение отрицательных чисел
 // <
 int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
     normalization_decimal(&value_1, &value_2);
@@ -161,4 +169,68 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
     return !is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
 }
 
+
+// ближайшее целое числа в сторону отрицательной бесконечности
+int s21_floor(s21_decimal value, s21_decimal *result) {
+    int exp = get_exp_decimal(value);
+    s21_decimal remainder = {0,};
+    s21_decimal then = {0,};
+    then.bits[0] = 10;
+    for (; exp > 0; exp--) {
+        div_decimal_with_remainder(value, then, &value, &remainder);
+    }
+    set_exp_decimal(&value, exp);
+
+    if (get_sign_decimal(value)) {
+        s21_decimal one = {{1, 0, 0, 0}};
+        set_sign_decimal(&one, true);
+        s21_add(value, one, &value);
+    }
+    
+    copy_decimal(value, result);
+    return 0;
+}
+
+
+// ближайшее целое число
+int s21_round(s21_decimal value, s21_decimal *result) {
+    int exp = get_exp_decimal(value);
+    s21_decimal remainder = {0,};
+    s21_decimal then = {0,};
+    then.bits[0] = 10;
+    for (; exp > 0; exp--) {
+        div_decimal_with_remainder(value, then, &value, &remainder);
+    }
+    set_exp_decimal(&value, exp);
+
+    s21_decimal five = {{5, 0, 0, 0}};
+    if (s21_is_greater_or_equal(remainder, five)) {
+        s21_decimal one = {{1, 0, 0, 0}};
+        set_sign_decimal(&one, get_sign_decimal(value));
+        s21_add(value, one, &value);
+    }
+    
+    copy_decimal(value, result);
+    return 0;
+}
+
+
+// цифры указанного Decimal числа; любые дробные цифры отбрасываются, включая конечные нули.
+int s21_truncate(s21_decimal value, s21_decimal *result) {
+    int exp = get_exp_decimal(value);
+    s21_decimal remainder = {0,};
+    s21_decimal then = {0,};
+    then.bits[0] = 10;
+    for (; exp > 0; exp--) {
+        div_decimal_with_remainder(value, then, &value, &remainder);
+    }
+    set_exp_decimal(&value, exp);
+    copy_decimal(value, result);
+    return 0;
+}
+
+
+int s21_negate(s21_decimal value, s21_decimal *result) {
+    return !set_sign_decimal(result, !get_sign_decimal(value));
+}
 

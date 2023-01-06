@@ -52,3 +52,4 @@ int reset_bit_int(int* number, int ind) {
 }
 
 
+
