@@ -3,16 +3,16 @@
 
 
 int main() {
-    s21_decimal a = {{0, 0, 0,  6 << 16}};
+    s21_decimal a = {{0, 0, 0,  1 << 16}};
     // s21_decimal b = {{0, 0, 0,  2 << 16}};
     s21_decimal c = {{0, 0, 0,  0}};
 
-    a.bits[0] = 0xffffffff;
+    // a.bits[0] = 0xffffffff;
     // set_bit_decimal(&a, INTS_IN_DECIMAL, BITS_IN_INT - 1);
-    // print_decimal(a);
-    // a.bits[1] = 0xffffffff;
+    a.bits[1] = 0xffffffff;
     // a.bits[2] = 0xffffffff;
-
+    float n = -1025;
+    s21_from_float_to_decimal(n, &a);
     // b.bits[0] = 0xffffffff;
     // b.bits[1] = 0xffffffff;
     // b.bits[2] = 0xffffffff;
@@ -20,7 +20,7 @@ int main() {
     // print_decimal_in_dec(a);
     // s21_round(a, &c);
     // s21_truncate(a, &c);
-    s21_floor(a, &c);
+    // s21_floor(a, &c);
 
     // printf("resultt = %d\n", s21_mul(a, b, &c));
     
@@ -30,6 +30,46 @@ int main() {
 
     return 0;
 }
+
+
+int s21_from_int_to_decimal(int src, s21_decimal *dst);
+
+
+int get_exp_float(float number) {
+    int* num = (int*)(&number);
+    reset_bit_int(num, BITS_IN_INT - 1);
+    *num >>= 23;
+    return *num - 127;
+}
+
+
+int get_sign_float(float number) {
+    int num = (int)(number);
+    return get_bit_int(num, BITS_IN_INT - 1);
+}
+
+
+int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+    // int* ptr = (int*)(&src);
+    // 0 00000000 000 0000 0000 0100 0000 0000
+    // 1,000 0000 0000 0100 0000 0000
+    // 1 000 0000 000,0 0100 0000 0000
+    // 1 + 2^(-13)
+    print_decimal_in_dec(*dst);
+    print_binary_int((*(int*)&src));
+    printf("\n");
+
+    printf("sign = %d\n", get_sign_float(src));
+    printf("exp = %d\n", get_exp_float(src));
+
+    return 0;
+}
+
+
+int s21_from_decimal_to_int(s21_decimal src, int *dst);
+
+
+int s21_from_decimal_to_float(s21_decimal src, float *dst);
 
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
@@ -127,46 +167,88 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 }
 
 
-// Сравнение отрицательных чисел
 // <
 int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
+    CompareStatus status = TRUE;
     normalization_decimal(&value_1, &value_2);
-    return is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
+    int sign_1 = get_sign_decimal(value_1);
+    int sign_2 = get_sign_decimal(value_2);
+    if (sign_1 == sign_2) {
+        int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
+        status = sign_1 ? !res : res;
+    } else {
+        status = sign_1 ? TRUE : FALSE;
+    } 
+    return status;
 }
 
 
 // <=
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
+    CompareStatus status = TRUE;
     normalization_decimal(&value_1, &value_2);
-    return is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL) || is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    int sign_1 = get_sign_decimal(value_1);
+    int sign_2 = get_sign_decimal(value_2);
+    if (sign_1 == sign_2) {
+        int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
+        status = sign_1 ? !res : res;
+        status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    } else {
+        status = FALSE;
+    } 
+    return status;
 }
 
 
 // >
 int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
+    CompareStatus status = TRUE;
     normalization_decimal(&value_1, &value_2);
-    return is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    int sign_1 = get_sign_decimal(value_1);
+    int sign_2 = get_sign_decimal(value_2);
+    if (sign_1 == sign_2) {
+        int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+        status = sign_1 ? res : !res;
+    } else {
+        status = sign_1 ? FALSE : TRUE;
+    } 
+    return status;
 }
 
 
 // >=
 int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2) {
+    CompareStatus status = TRUE;
     normalization_decimal(&value_1, &value_2);
-    return is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL) || is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    int sign_1 = get_sign_decimal(value_1);
+    int sign_2 = get_sign_decimal(value_2);
+    if (sign_1 == sign_2) {
+        int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+        status = sign_1 ? res : !res;
+        status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    } else {
+        status = FALSE;
+    } 
+    return status;
 }
 
 
 // ==
 int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
+    CompareStatus status = FALSE;
     normalization_decimal(&value_1, &value_2);
-    return is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    int sign_1 = get_sign_decimal(value_1);
+    int sign_2 = get_sign_decimal(value_2);
+    if (sign_1 == sign_2) {
+        status = is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    }
+    return status;
 }
 
 
 // !=
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
-    normalization_decimal(&value_1, &value_2);
-    return !is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+    return !s21_is_equal(value_1, value_2);
 }
 
 
