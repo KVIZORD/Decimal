@@ -330,4 +330,3 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
 int s21_negate(s21_decimal value, s21_decimal *result) {
     return !set_sign_decimal(result, !get_sign_decimal(value));
 }
-
