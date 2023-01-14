@@ -9,14 +9,14 @@ int main() {
     s21_from_int_to_decimal(src, &dst);
     print_decimal(dst);
 
-    s21_decimal src_2 = {{-54353, 1, 0, 0}};
-    set_exp_decimal(&src_2, 2);
-    int dst_2 = -__INT_MAX__;
+    s21_decimal src_2 = {{__INT_MAX__, __INT_MAX__, 0, 0}};
+    set_sign_decimal(&src_2, 1);
+    set_exp_decimal(&src_2, 1);
+    int dst_2 = 1;
 
-    print_decimal(src_2);
+    print_decimal_in_dec(src_2);
     s21_from_decimal_to_int(src_2, &dst_2);
-    printf("%d", dst_2);
-
+    printf("%d\n", dst_2);
     return 0;
 }
 
@@ -66,19 +66,21 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
 
 
 int s21_from_decimal_to_int(s21_decimal src, int *dst){
+    s21_decimal res = src;
+    s21_decimal ten;
+    s21_from_int_to_decimal(10, &ten);
     int status = 0;
     int exp = get_exp_decimal(src);
-    int num = src.bits[0];
-    if (src.bits[1] != 0 || src.bits[2] != 0){ 
-    status = 1;
-    *dst = 0;
-    }
     while (exp != 0){
-        num /= 10;
-        exp -= 1;
+    div_decimal_with_remainder(res, ten, &res, &(s21_decimal){0,});
+    exp -= 1;
+    }
+    int num = res.bits[0];
+    if (res.bits[1] != 0 || res.bits[2] != 0){ 
+    status = 1;
     }
     if (!status){
-        *dst = get_sign_decimal(src) ? num * -1 : num; 
+        *dst = get_sign_decimal(res) ? num * -1 : num; 
     }
     return status;
 }
