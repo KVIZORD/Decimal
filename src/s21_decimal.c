@@ -3,36 +3,27 @@
 
 
 int main() {
-    s21_decimal a = {{0, 0, 0,  1 << 16}};
-    // s21_decimal b = {{0, 0, 0,  2 << 16}};
-    s21_decimal c = {{0, 0, 0,  0}};
+    s21_decimal dst = {{0, 0, 0, 0}};
+    int src = -__INT_MAX__;
 
-    // a.bits[0] = 0xffffffff;
-    // set_bit_decimal(&a, INTS_IN_DECIMAL, BITS_IN_INT - 1);
-    a.bits[1] = 0xffffffff;
-    // a.bits[2] = 0xffffffff;
-    float n = -1025;
-    s21_from_float_to_decimal(n, &a);
-    // b.bits[0] = 0xffffffff;
-    // b.bits[1] = 0xffffffff;
-    // b.bits[2] = 0xffffffff;
-
-    // print_decimal_in_dec(a);
-    // s21_round(a, &c);
-    // s21_truncate(a, &c);
-    // s21_floor(a, &c);
-
-    // printf("resultt = %d\n", s21_mul(a, b, &c));
-    
-    print_decimal_in_dec(a);
-    // print_decimal_in_dec(b);
-    print_decimal_in_dec(c);
+    s21_from_int_to_decimal(src, &dst);
+    print_decimal(dst);
 
     return 0;
 }
 
 
-int s21_from_int_to_decimal(int src, s21_decimal *dst);
+int s21_from_int_to_decimal(int src, s21_decimal *dst){
+    if (src < 0){
+        set_sign_decimal(dst, 1);
+        src *= -1;
+    }
+    dst->bits[0] = src;
+    dst->bits[1] = 0;
+    dst->bits[2] = 0;
+
+    return 0;
+}
 
 
 int get_exp_float(float number) {
