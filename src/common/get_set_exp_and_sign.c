@@ -1,7 +1,6 @@
 #include "common.h"
 
 
-
 int get_exp(int number) {
     return (number << (BITS_IN_INT - 1 - BIT_EXP_END)) >> (BITS_IN_INT - 1 - BIT_EXP_END + BIT_EXP_START);
 }
@@ -60,28 +59,16 @@ int set_sign_double_decimal(s21_double_decimal* value, int sign) {
     return set_sign(&(value->bits[2 * INTS_IN_DECIMAL]), sign);
 }
 
+int get_sign_float(float number) {
+    int num = (int)(number);
+    return get_bit_int(num, BITS_IN_INT - 1);
+}
 
-void change_exp_decimal(s21_decimal* value, int exp) {
-    int exp_old = get_exp_decimal(*value);
-    int exp_new = exp_old;
-    s21_decimal tmp = {{0, 0, 0, 0}};
-    for (int i = exp_old; i < exp; i++) {
-        // bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        bool status = 0;
-        if (status) {
-            break;
-        }
-        exp_new += 1;
-        copy_decimal(tmp, value);
+int set_sign_float(float* number, int sign) {
+    int* num = (int*)(number);
+    int status = true;
+    if (sign) {
+        status = reset_bit_int(num, BITS_IN_INT - 1);
     }
-    for (int i = exp; i < exp_old; i++) {
-        // bool status = s21_div(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        bool status = 0;
-        if (status) {
-            break;
-        }
-        exp_new -= 1;
-        copy_decimal(tmp, value);
-    }
-    set_exp_decimal(value, exp_new);
+    return status;
 }

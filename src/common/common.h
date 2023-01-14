@@ -13,6 +13,8 @@ int is_zero_decimal(s21_decimal value);
 int is_zero_double_decimal(s21_double_decimal value);
 void clear_decimal(s21_decimal* value);
 void clear_double_decimal(s21_double_decimal* value);
+void clear_full_decimal(s21_decimal* value);
+int float_to_scientific_notation_base_10(float num, int len_mantissa, int* mantissa, int* exp);
 
 // arithmetic.c
 int sum_int(int number_1, int number_2, int* result, bool transfer_bit);
@@ -57,6 +59,8 @@ int set_sign_decimal(s21_decimal* value, int sign);
 int get_sign_double_decimal(s21_double_decimal value);
 int set_sign_double_decimal(s21_double_decimal* value, int sign);
 void change_exp_decimal(s21_decimal* value, int exp);
+int get_sign_float(float number);
+int set_sign_float(float* number, int sign);
 
 // shift.c
 int left_shift_decimal(s21_decimal* value);

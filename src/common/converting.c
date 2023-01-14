@@ -36,11 +36,10 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
     s21_double_decimal then = {0,};
     then.bits[0] = 10;
     int exp = get_exp_double_decimal(src);
-    while (exp < 2 * EXP_MAX && exp > EXP_MIN && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
+    while (exp < 2 * EXP_MAX && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
         div_double_decimal(src, then, &src);
         exp -= 1;
     }
-
     if (exp > EXP_MAX) {
         status = INF_NEGAT;
     } else if (exp < EXP_MIN) {

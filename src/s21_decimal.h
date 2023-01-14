@@ -4,6 +4,7 @@
 // #include "common/bit_operations.h"
 // #include "common/print.h"
 #include <stdbool.h>
+#include <math.h>
 
 #define BITS_IN_INT 32              // кол-во бит в инте
 #define INTS_IN_DECIMAL 3           // кол-во INT хранящих значащее число
@@ -13,6 +14,7 @@
 #define BIT_EXP_END 23              // индекс бита в INT до которого хранится экспонента
 #define EXP_MAX 28                  // максимальное значение экспоненты
 #define EXP_MIN 0                   // минимальное значение экспоненты
+#define FLOAT_NUMBER_SIGNIFICANT_DIGITS 7   // кол-во значимых цифр копируемых из float в decimal
 
 typedef struct {
     int bits[1 + INTS_IN_DECIMAL];

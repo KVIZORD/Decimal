@@ -132,37 +132,6 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor, 
 }
 
 
-int div_decimal_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal* result) {
-    int status = 0;
-    printf("qwertyuiop\n");
-    s21_decimal complement = {0,};
-    copy_decimal(divisor, &complement);
-    convert_ints_to_twos_complement(complement.bits, INTS_IN_DECIMAL);
-    if (!is_zero_decimal(divisor)) {
-        s21_decimal tmp = {0,};
-        copy_decimal(dividend, &tmp);
-        int count = get_width_number_bits_non_blunk(tmp.bits, INTS_IN_DECIMAL);
-        for (int num_int = INTS_IN_DECIMAL - 1; num_int >= 0; num_int--) {
-            int num_bit = (num_int == INTS_IN_DECIMAL - 1) ? BITS_IN_INT - 1 - count : BITS_IN_INT - 1;
-            for (; num_bit >= 0; num_bit--) {
-                left_shift_decimal(&tmp);
-                if (is_greater_ints(tmp.bits, divisor.bits, INTS_IN_DECIMAL)) {
-                    sum_ints(tmp.bits, complement.bits, tmp.bits, INTS_IN_DECIMAL);                    
-                    set_bit_decimal(result, num_int, num_bit);
-                } else if (is_equal_ints(tmp.bits, divisor.bits, INTS_IN_DECIMAL)) {
-                    clear_decimal(&tmp);
-                    set_bit_decimal(result, num_int, num_bit);
-                    break;
-                }
-            }
-        }
-    } else {
-        status = 3;
-    }
-    return status;
-}
-
-
 int mul_ints(int* value_1, int* value_2, int* result, int count_int) {
     for (int i = 0; i < count_int; i++) {
         for (int j = 0; j < BITS_IN_INT; j++) {
