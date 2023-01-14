@@ -9,6 +9,14 @@ int main() {
     s21_from_int_to_decimal(src, &dst);
     print_decimal(dst);
 
+    s21_decimal src_2 = {{-54353, 1, 0, 0}};
+    set_exp_decimal(&src_2, 2);
+    int dst_2 = -__INT_MAX__;
+
+    print_decimal(src_2);
+    s21_from_decimal_to_int(src_2, &dst_2);
+    printf("%d", dst_2);
+
     return 0;
 }
 
@@ -57,7 +65,23 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
 }
 
 
-int s21_from_decimal_to_int(s21_decimal src, int *dst);
+int s21_from_decimal_to_int(s21_decimal src, int *dst){
+    int status = 0;
+    int exp = get_exp_decimal(src);
+    int num = src.bits[0];
+    if (src.bits[1] != 0 || src.bits[2] != 0){ 
+    status = 1;
+    *dst = 0;
+    }
+    while (exp != 0){
+        num /= 10;
+        exp -= 1;
+    }
+    if (!status){
+        *dst = get_sign_decimal(src) ? num * -1 : num; 
+    }
+    return status;
+}
 
 
 int s21_from_decimal_to_float(s21_decimal src, float *dst);
