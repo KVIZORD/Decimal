@@ -26,9 +26,7 @@ int is_equal_ints(int* value_1, int* value_2, int count_int);
 int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
 int div_double_decimal_with_remainder(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *quotient, s21_double_decimal *remainder);
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *result);
-// int div_decimal_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal* result);
 void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new);
-// int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
 
 // converting.c
 void convert_decimal_to_twos_complement(s21_decimal *value);
@@ -40,7 +38,6 @@ void decimal_to_double_decimal(s21_decimal src, s21_double_decimal* dst);
 int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
 void change_exp(s21_decimal* value, int exp);
 int bank_round_decimal(s21_decimal* value, int remainder);
-int bank_round_double_decimal(s21_double_decimal* value, int remainder);
 
 // copy.c
 int copy_decimal(s21_decimal src, s21_decimal* dst);

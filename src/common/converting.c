@@ -1,19 +1,5 @@
 #include "common.h"
 
-// void convert_double_decimal_to_twos_complement(s21_double_decimal *value) {
-//     convert_double_decimal_to_ones_complement(value);
-//     s21_decimal one = {{1, 0, 0, 0}};
-//     set_sign_double_decimal(&one, get_sign_double_decimal(*value));
-//     set_exp_double_decimal(&one, get_exp_double_decimal(*value));
-//     s21_add(*value, one, value);
-// }
-
-// void convert_double_decimal_to_ones_complement(s21_double_decimal* value) {
-//     for (int i = 0; i < 2 * INTS_IN_DECIMAL; i++) {
-//         value->bits[i] = ~(value->bits[i]);
-//     }
-// }
-
 void convert_decimal_to_twos_complement(s21_decimal *value) {
     convert_decimal_to_ones_complement(value);
     s21_decimal one = {{1, 0, 0, 0}};
@@ -60,10 +46,6 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
     } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
         status = INF_POSIT;
     } else {
-        // s21_double_decimal remainder = {0,};
-        // div_double_decimal_with_remainder(src, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 0}}, &(s21_double_decimal){0,}, &remainder);
-        // bank_round_decimal(&src, remainder.bits[0]);
-
         set_exp_double_decimal(&src, exp);
         for (int i = 0; i < INTS_IN_DECIMAL; i++) {
             dst->bits[i] = src.bits[i];
@@ -71,7 +53,6 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
         dst->bits[INTS_IN_DECIMAL] = src.bits[2 * INTS_IN_DECIMAL];
         s21_double_decimal remainder = {0,};
         div_double_decimal_with_remainder(prev, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 0}}, &(s21_double_decimal){0,}, &remainder);
-        // print_double_decimal_in_dec(remainder);
         bank_round_decimal(dst, remainder.bits[0]);
     }
 
@@ -98,12 +79,21 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
         change_exp(value_1, exp_2);
         exp_1 = get_exp_decimal(*value_1);
     }
+    // printf("value_1 ");
+    // print_decimal_in_dec(*value_1);
+    // printf("value_2 ");
+    // print_decimal_in_dec(*value_2);
     if (status == STATUS_OK && exp_1 < exp_2) {
         change_exp(value_1, exp_2);
         exp_1 = get_exp_decimal(*value_1);
+
         change_exp(value_2, exp_1);
         exp_2 = get_exp_decimal(*value_2);
     }
+    // printf("value_1 ");
+    // print_decimal_in_dec(*value_1);
+    // printf("value_2 ");
+    // print_decimal_in_dec(*value_2);
     if (exp_1 != exp_2) {
         status = STATUS_ERR;
     }
@@ -116,7 +106,10 @@ void change_exp(s21_decimal* value, int exp) {
     int exp_old = get_exp_decimal(*value);
     int exp_new = exp_old;
     for (int i = exp_old; i < exp; i++) {
+        printf(" mul 10\n");
+        print_decimal_in_dec(*value);
         bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
+        print_decimal_in_dec(*value);
         if (status) {
             break;
         }
@@ -124,6 +117,7 @@ void change_exp(s21_decimal* value, int exp) {
         copy_decimal(tmp, value);
     }
     for (int i = exp; i < exp_old; i++) {
+        printf(" div 10\n");
         bool status = s21_div(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
         copy_decimal(tmp, value);
         if (status) {
@@ -133,6 +127,8 @@ void change_exp(s21_decimal* value, int exp) {
         copy_decimal(tmp, value);
     }
     set_exp_decimal(value, exp_new);
+    // print_decimal_in_dec(*value);
+    // printf("status = %d\n", status);
 }
 
 int bank_round_decimal(s21_decimal* dst, int remainder) {
