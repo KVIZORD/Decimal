@@ -3,18 +3,19 @@
 #include <math.h>
 
 int main() {
-    s21_decimal a = {{0, 0, 0,  11 << 16}};
-    // s21_decimal b = {{0, 0, 0,  2 << 16}};
-    // s21_decimal c = {{0, 0, 0,  0}};
+    s21_decimal a = {{0, 0, 0,  3 << 16}};
+    s21_decimal b = {{0, 0, 0,  0 << 16}};
+    s21_decimal c = {{0, 0, 0,  0}};
 
     a.bits[0] = 0xffffffff;
     a.bits[1] = 0xffffffff;
     a.bits[2] = 0xffffffff;
     // set_sign_decimal(&a, 1);
-    float n;
-    printf("res = %d\n", s21_from_decimal_to_float(a, &n));
-    printf("n = %f\n", n);
+    // float n;
+    // printf("res = %d\n", s21_from_decimal_to_float(a, &n));
+    // printf("n = %f\n", n);
 
+    b.bits[0] = 5;
     // b.bits[0] = 0xffffffff;
     // b.bits[1] = 0xffffffff;
     // b.bits[2] = 0xffffffff;
@@ -24,11 +25,11 @@ int main() {
     // s21_truncate(a, &c);
     // s21_floor(a, &c);
 
-    // printf("resultt = %d\n", s21_mul(a, b, &c));
+    printf("result = %d\n", s21_mul(a, b, &c));
     
-    // print_decimal_in_dec(a);
-    // print_decimal_in_dec(b);
-    // print_decimal_in_dec(c);
+    print_decimal_in_dec(a);
+    print_decimal_in_dec(b);
+    print_decimal_in_dec(c);
 
     return 0;
 }
@@ -95,6 +96,7 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
             set_sign_double_decimal(&res, sign_1);
             set_exp_double_decimal(&res, exp);
             sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
+            print_double_decimal_in_dec(res);
             status = double_decimal_to_decimal(res, result);
         } else if (sign_1) {
             set_sign_decimal(&value_1, false);

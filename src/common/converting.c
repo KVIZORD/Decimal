@@ -1,7 +1,19 @@
 #include "common.h"
 
+// void convert_double_decimal_to_twos_complement(s21_double_decimal *value) {
+//     convert_double_decimal_to_ones_complement(value);
+//     s21_decimal one = {{1, 0, 0, 0}};
+//     set_sign_double_decimal(&one, get_sign_double_decimal(*value));
+//     set_exp_double_decimal(&one, get_exp_double_decimal(*value));
+//     s21_add(*value, one, value);
+// }
 
-// Конверирование мантисы DECIMAL в дополнительный код
+// void convert_double_decimal_to_ones_complement(s21_double_decimal* value) {
+//     for (int i = 0; i < 2 * INTS_IN_DECIMAL; i++) {
+//         value->bits[i] = ~(value->bits[i]);
+//     }
+// }
+
 void convert_decimal_to_twos_complement(s21_decimal *value) {
     convert_decimal_to_ones_complement(value);
     s21_decimal one = {{1, 0, 0, 0}};
@@ -10,7 +22,6 @@ void convert_decimal_to_twos_complement(s21_decimal *value) {
     s21_add(*value, one, value);
 }
 
-// Конверирование мантисы DECIMAL в обратный код
 void convert_decimal_to_ones_complement(s21_decimal* value) {
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
         value->bits[i] = ~(value->bits[i]);
@@ -32,11 +43,13 @@ void convert_ints_to_ones_complement(int* value, int count_int) {
 }
 
 int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
+    int exp = get_exp_double_decimal(src);
     ArithmeticStatus status = OK;
     s21_double_decimal then = {0,};
+    s21_double_decimal prev = {0,};
     then.bits[0] = 10;
-    int exp = get_exp_double_decimal(src);
     while (exp < 2 * EXP_MAX && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
+        copy_double_decimal(src, &prev);
         div_double_decimal(src, then, &src);
         exp -= 1;
     }
@@ -47,11 +60,19 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
     } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
         status = INF_POSIT;
     } else {
+        // s21_double_decimal remainder = {0,};
+        // div_double_decimal_with_remainder(src, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 0}}, &(s21_double_decimal){0,}, &remainder);
+        // bank_round_decimal(&src, remainder.bits[0]);
+
         set_exp_double_decimal(&src, exp);
         for (int i = 0; i < INTS_IN_DECIMAL; i++) {
             dst->bits[i] = src.bits[i];
         }
         dst->bits[INTS_IN_DECIMAL] = src.bits[2 * INTS_IN_DECIMAL];
+        s21_double_decimal remainder = {0,};
+        div_double_decimal_with_remainder(prev, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 0}}, &(s21_double_decimal){0,}, &remainder);
+        // print_double_decimal_in_dec(remainder);
+        bank_round_decimal(dst, remainder.bits[0]);
     }
 
     return status;
@@ -63,29 +84,6 @@ void decimal_to_double_decimal(s21_decimal src, s21_double_decimal* dst) {
     }
     dst->bits[2 * INTS_IN_DECIMAL] = src.bits[INTS_IN_DECIMAL];
 }
-
-void double_decimal_to_decimal_1(s21_double_decimal src, s21_decimal* dst) {
-    for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-        dst->bits[i] = src.bits[i + INTS_IN_DECIMAL];
-    }
-    dst->bits[INTS_IN_DECIMAL] = src.bits[2 * INTS_IN_DECIMAL];
-}
-
-// // Конверирование мантисы DOUBLE DECIMAL в дополнительный код
-// void convert_double_decimal_to_twos_complement(s21_decimal *value) {
-//     convert_decimal_to_ones_complement(value);
-//     s21_decimal one = {{1, 0, 0, 0}};
-//     set_sign_decimal(&one, get_sign_decimal(*value));
-//     set_exponent_decimal(&one, get_exponent_decimal(*value));
-//     s21_add(*value, one, value);
-// }
-
-// // Конверирование мантисы DOUBLE DECIMAL в обратный код
-// void convert_double_decimal_to_ones_complement(s21_decimal* value) {
-//     for (int i = 0; i < 2 * INTS_IN_DECIMAL; i++) {
-//         value->bits[i] = ~(value->bits[i]);
-//     }
-// }
 
 int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
     Status status = STATUS_OK;
@@ -135,4 +133,24 @@ void change_exp(s21_decimal* value, int exp) {
         copy_decimal(tmp, value);
     }
     set_exp_decimal(value, exp_new);
+}
+
+int bank_round_decimal(s21_decimal* dst, int remainder) {
+    ArithmeticStatus status = OK;
+    s21_double_decimal res = {0,};
+    s21_decimal one = {{1, 0, 0, 0}};
+    if (remainder == 5) {
+        s21_decimal then = {{10, 0, 0, 0}};
+        s21_decimal last_number = {0,};
+        s21_mod(*dst, then, &last_number);
+        if (last_number.bits[0] % 2) {
+            sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
+            status = double_decimal_to_decimal(res, dst);
+
+        }
+    } else if (remainder > 5) {
+        sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
+        status = double_decimal_to_decimal(res, dst);
+    }
+    return status;
 }
