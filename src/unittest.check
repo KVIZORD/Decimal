@@ -1,0 +1,12 @@
+#include "s21_decimal.h"
+
+#include <check.h>
+#include <limits.h>
+
+#suite comparison
+    #tcase s21_is_less
+        #test first_less
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 1);

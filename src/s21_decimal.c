@@ -2,23 +2,23 @@
 
 #include "common/common.h"
 
-int main() {
-  s21_decimal dst = {{0, 0, 0, 0}};
-  int src = -__INT_MAX__;
+// int main() {
+//   s21_decimal dst = {{0, 0, 0, 0}};
+//   int src = -__INT_MAX__;
 
-  s21_from_int_to_decimal(src, &dst);
-  print_decimal(dst);
+//   s21_from_int_to_decimal(src, &dst);
+//   print_decimal(dst);
 
-  s21_decimal src_2 = {{__UINT32_MAX__, __UINT32_MAX__, __UINT32_MAX__, 0}};
-  set_sign_decimal(&src_2, 1);
-  set_exp_decimal(&src_2, 28);
-  int dst_2 = 1;
+//   s21_decimal src_2 = {{__UINT32_MAX__, __UINT32_MAX__, __UINT32_MAX__, 0}};
+//   set_sign_decimal(&src_2, 1);
+//   set_exp_decimal(&src_2, 28);
+//   int dst_2 = 1;
 
-  print_decimal_in_dec(src_2);
-  s21_from_decimal_to_int(src_2, &dst_2);
-  printf("%d\n", dst_2);
-  return 0;
-}
+//   print_decimal_in_dec(src_2);
+//   s21_from_decimal_to_int(src_2, &dst_2);
+//   printf("%d\n", dst_2);
+//   return 0;
+// }
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   int status = STATUS_OK;
