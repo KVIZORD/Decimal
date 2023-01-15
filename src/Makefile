@@ -45,7 +45,7 @@ gcov_report:
 	open ./s21_lcov_report/index.html
 
 
-test: clean $(MAIN_FILE).a
+test: clean $(MAIN_FILE).a autotest
 	$(CC) $(CFLAGS) -o $(TEST) $(TEST).c $(MAIN_FILE).a $(LIBS)
 	./$(TEST)
 

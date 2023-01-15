@@ -208,8 +208,9 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   int sign_1 = get_sign_decimal(value_1);
   int sign_2 = get_sign_decimal(value_2);
   if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? !res : res;
+    printf("test");
+    status = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
+    // status = sign_1 ? !res : res;
   } else {
     status = sign_1 ? TRUE : FALSE;
   }
@@ -234,33 +235,12 @@ int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
 
 // >
 int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
-  normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? res : !res;
-  } else {
-    status = sign_1 ? FALSE : TRUE;
-  }
-  return status;
+  return !s21_is_less_or_equal(value_1, value_2);
 }
 
 // >=
 int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
-  normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? res : !res;
-    status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-  } else {
-    status = FALSE;
-  }
-  return status;
+  return !s21_is_less(value_1, value_2);
 }
 
 // ==
