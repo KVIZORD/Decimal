@@ -342,8 +342,48 @@
         ck_assert_int_eq(res, 0);
 
 
+#suite convertors
 
+    #tcase s21_from_int_to_decimal
 
+        #test from_int_to_decimal_normal
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = 1234567;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 1234567);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
 
+        #test from_int_to_decimal_zero
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = 0;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 0);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
+
+        #test from_int_to_decimal_min_int
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = INT_MIN;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], INT_MIN);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], INT_MIN);
+
+        #test from_int_to_decimal_max_int
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = INT_MAX;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], INT_MAX);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
 
     
