@@ -2,24 +2,6 @@
 
 #include "common/common.h"
 
-// int main() {
-//   s21_decimal dst = {{0, 0, 0, 0}};
-//   int src = -__INT_MAX__;
-
-//   s21_from_int_to_decimal(src, &dst);
-//   print_decimal(dst);
-
-//   s21_decimal src_2 = {{__UINT32_MAX__, __UINT32_MAX__, __UINT32_MAX__, 0}};
-//   set_sign_decimal(&src_2, 1);
-//   set_exp_decimal(&src_2, 28);
-//   int dst_2 = 1;
-
-//   print_decimal_in_dec(src_2);
-//   s21_from_decimal_to_int(src_2, &dst_2);
-//   printf("%d\n", dst_2);
-//   return 0;
-// }
-
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
   int status = STATUS_OK;
   if (dst) {
@@ -44,27 +26,6 @@ int get_exp_float(float number) {
   return *num - 127;
 }
 
-int get_sign_float(float number) {
-  int num = (int)(number);
-  return get_bit_int(num, BITS_IN_INT - 1);
-}
-
-int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  // int* ptr = (int*)(&src);
-  // 0 00000000 000 0000 0000 0100 0000 0000
-  // 1,000 0000 0000 0100 0000 0000
-  // 1 000 0000 000,0 0100 0000 0000
-  // 1 + 2^(-13)
-  print_decimal_in_dec(*dst);
-  print_binary_int((*(int *)&src));
-  printf("\n");
-
-  printf("sign = %d\n", get_sign_float(src));
-  printf("exp = %d\n", get_exp_float(src));
-
-  return 0;
-}
-
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   s21_decimal res = src;
   s21_decimal ten = {{10, 0, 0, 0}};
@@ -85,27 +46,6 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
     *dst = get_sign_decimal(res) ? num * -1 : num;
   }
   return status;
-}
-
-int s21_from_decimal_to_float(s21_decimal src, float *dst) {
-  int exp = get_exp_decimal(src);
-  int sign = get_sign_decimal(src);
-  double numb = 0;
-  for (int i = 0; i < INTS_IN_DECIMAL; i++) {
-    for (int j = 0; j < BITS_IN_INT; j++) {
-      if (get_bit_decimal(src, i, j)) {
-        numb += pow(2, j + i * BITS_IN_INT);
-      }
-    }
-  }
-  for (int i = 0; i < exp; i++) {
-    numb /= 10;
-  }
-  *dst = (float)numb;
-  if (sign) {
-    *dst *= -1;
-  }
-  return 0;
 }
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
@@ -281,7 +221,52 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
   return !s21_is_equal(value_1, value_2);
 }
 
-// ближайшее целое числа в сторону отрицательной бесконечности
+int s21_from_float_to_decimal(float src, s21_decimal *dst) {
+  Status status = STATUS_OK;
+  int mantissa = 0;
+  int exp = 0;
+  int sign = get_sign_float(src);
+  clear_full_decimal(dst);
+  set_sign_float(&src, sign);
+  float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
+                                       &mantissa, &exp);
+  copy_ints(&mantissa, dst->bits, 0);
+  while (exp > EXP_MIN && status == STATUS_OK) {
+    status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
+    exp -= 1;
+  }
+  if (status == STATUS_OK && -exp >= EXP_MIN && -exp <= EXP_MAX) {
+    set_exp_decimal(dst, -exp);
+    set_sign_decimal(dst, sign);
+  } else {
+    status = STATUS_ERR;
+    clear_full_decimal(dst);
+  }
+  return status;
+}
+
+int s21_from_decimal_to_float(s21_decimal src, float *dst) {
+  int exp = get_exp_decimal(src);
+  int sign = get_sign_decimal(src);
+  double numb = 0;
+  for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+    for (int j = 0; j < BITS_IN_INT; j++) {
+      if (get_bit_decimal(src, i, j)) {
+        numb += pow(2, j + i * BITS_IN_INT);
+      }
+    }
+  }
+  for (int i = 0; i < exp; i++) {
+    numb /= 10;
+  }
+  *dst = (float)numb;
+  if (sign) {
+    *dst *= -1;
+  }
+  return 0;
+}
+
+// ближайшее целое число в сторону отрицательной бесконечности
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int exp = get_exp_decimal(value);
   s21_decimal remainder = {
@@ -295,7 +280,6 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
     div_decimal_with_remainder(value, then, &value, &remainder);
   }
   set_exp_decimal(&value, exp);
-
   if (get_sign_decimal(value)) {
     s21_decimal one = {{1, 0, 0, 0}};
     set_sign_decimal(&one, true);

@@ -67,6 +67,37 @@ int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_de
     return status;
 }
 
+int div_double_decimal_with_remainder(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *quotient, s21_double_decimal *remainder) {
+    int status = 0;
+    if (!is_zero_double_decimal(divisor)) {
+        s21_double_decimal complement = {0,};
+        copy_double_decimal(divisor, &complement);
+        clear_double_decimal(quotient);
+        clear_double_decimal(remainder);
+        convert_ints_to_twos_complement(complement.bits, 2 * INTS_IN_DECIMAL);
+        for (int num_int = 2 * INTS_IN_DECIMAL - 1; num_int >= 0; num_int--) {
+            for (int num_bit = BITS_IN_INT - 1; num_bit >= 0; num_bit--) {
+                left_shift_double_decimal(remainder);
+                if (get_bit_double_decimal(dividend, num_int, num_bit)) {
+                    set_bit_double_decimal(remainder, 0, 0);
+                }
+                if (is_greater_ints(remainder->bits, divisor.bits, 2 * INTS_IN_DECIMAL)) {
+                    sum_ints(remainder->bits, complement.bits, remainder->bits, 2 * INTS_IN_DECIMAL);
+                    set_bit_double_decimal(quotient, num_int, num_bit);
+                } else if (is_equal_ints(remainder->bits, divisor.bits, 2 * INTS_IN_DECIMAL)) {
+                    clear_double_decimal(remainder);
+                    set_bit_double_decimal(quotient, num_int, num_bit);
+                } else {
+                    reset_bit_double_decimal(quotient, num_int, num_bit);
+                }
+            }
+        }
+    } else {
+        status = 3;
+    }
+    return status;
+}
+
 
 int is_greater_ints(int* value_1, int* value_2, int count_int) {
     bool less = false;

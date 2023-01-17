@@ -13,6 +13,8 @@ int is_zero_decimal(s21_decimal value);
 int is_zero_double_decimal(s21_double_decimal value);
 void clear_decimal(s21_decimal* value);
 void clear_double_decimal(s21_double_decimal* value);
+void clear_full_decimal(s21_decimal* value);
+int float_to_scientific_notation_base_10(float num, int len_mantissa, int* mantissa, int* exp);
 
 // arithmetic.c
 int sum_int(int number_1, int number_2, int* result, bool transfer_bit);
@@ -22,10 +24,9 @@ int mul_ints(int* value_1, int* value_2, int* result, int count_int);
 int is_greater_ints(int* value_1, int* value_2, int count_int);
 int is_equal_ints(int* value_1, int* value_2, int count_int);
 int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
+int div_double_decimal_with_remainder(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *quotient, s21_double_decimal *remainder);
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *result);
-int div_decimal_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal* result);
 void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new);
-// int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
 
 // converting.c
 void convert_decimal_to_twos_complement(s21_decimal *value);
@@ -34,9 +35,9 @@ void convert_ints_to_twos_complement(int* value, int count_int);
 void convert_ints_to_ones_complement(int* value, int count_int);
 int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst);
 void decimal_to_double_decimal(s21_decimal src, s21_double_decimal* dst);
-void double_decimal_to_decimal_1(s21_double_decimal src, s21_decimal* dst);
 int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
 void change_exp(s21_decimal* value, int exp);
+int bank_round_decimal(s21_decimal* value, int remainder);
 
 // copy.c
 int copy_decimal(s21_decimal src, s21_decimal* dst);
@@ -57,6 +58,8 @@ int set_sign_decimal(s21_decimal* value, int sign);
 int get_sign_double_decimal(s21_double_decimal value);
 int set_sign_double_decimal(s21_double_decimal* value, int sign);
 void change_exp_decimal(s21_decimal* value, int exp);
+int get_sign_float(float number);
+int set_sign_float(float* number, int sign);
 
 // shift.c
 int left_shift_decimal(s21_decimal* value);

@@ -32,6 +32,10 @@ common.o: common/*.c common/common.h
 $(MAIN_FILE).o: $(MAIN_FILE).c $(MAIN_FILE).h 
 	$(CC) $(CFLAGS) -c $(MAIN_FILE).c 
 
+
+common.o: common/*.c common/common.h 
+	$(CC) $(CFLAGS) -c common/*.c 
+
 $(MAIN_FILE).a: $(MAIN_FILE).o common.o
 	ar rc $(MAIN_FILE).a $(MAIN_FILE).o *.o
 	ranlib $(MAIN_FILE).a
@@ -47,6 +51,7 @@ gcov_report:
 
 test: clean $(MAIN_FILE).a autotest
 	$(CC) $(CFLAGS) -o $(TEST) $(TEST).c $(MAIN_FILE).a $(LIBS)
+	rm -rf *.o
 	./$(TEST)
 
 check: test
