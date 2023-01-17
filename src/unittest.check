@@ -461,4 +461,45 @@
         ck_assert_int_eq(dst, 25);
         ck_assert_int_eq(res, 0);
 
-    
+
+    #tcase s21_from_decimal_to_float
+
+        #test from_decimal_to_float_valid
+        float dst;
+        s21_decimal src = {{100, 0, 0, 0}};
+        set_exp_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 10.0);
+
+        //#test from_decimal_to_float_overflow
+        //float dst;
+        //s21_decimal src = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        //int res = s21_from_decimal_to_float(src, &dst);
+        //ck_assert_int_eq(res, 1);
+
+        #test from_decimal_to_float_negative
+        float dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, -25.0f);
+
+        #test from_decimal_to_float_zero
+        float dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 0.0f);
+
+        #test from_decimal_to_float_negative_zero
+        float dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 0.0);
+
+
+

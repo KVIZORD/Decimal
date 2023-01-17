@@ -87,7 +87,26 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   return status;
 }
 
-int s21_from_decimal_to_float(s21_decimal src, float *dst);
+int s21_from_decimal_to_float(s21_decimal src, float *dst) {
+  int exp = get_exp_decimal(src);
+  int sign = get_sign_decimal(src);
+  double numb = 0;
+  for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+    for (int j = 0; j < BITS_IN_INT; j++) {
+      if (get_bit_decimal(src, i, j)) {
+        numb += pow(2, j + i * BITS_IN_INT);
+      }
+    }
+  }
+  for (int i = 0; i < exp; i++) {
+    numb /= 10;
+  }
+  *dst = (float)numb;
+  if (sign) {
+    *dst *= -1;
+  }
+  return 0;
+}
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   ArithmeticStatus status = OK;
