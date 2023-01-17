@@ -501,5 +501,45 @@
         ck_assert_int_eq(res, 0);
         ck_assert_float_eq(dst, 0.0);
 
+    #tcase s21_from_float_to_decimal
 
+        #test from_float_to_decimal_valid_conversion
+        float src = 25.5;
+        s21_decimal dst;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.data[0], 25);
+        ck_assert_int_eq(dst.data[1], 5);
+
+        #test from_float_to_decimal_overflow
+        float src = __INT_MAX__;
+        s21_decimal dst;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 1);
+
+        #test from_float_to_decimal_negative
+        float src = -25.5;
+        s21_decimal dst;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.data[0], 25);
+        ck_assert_int_eq(dst.data[1], 5);
+        ck_assert_int_eq(get_sign_decimal(dst), 1);
+
+        #test from_float_to_decimal_zero
+        float src = 0.0;
+        s21_decimal dst;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.data[0], 0);
+        ck_assert_int_eq(dst.data[1], 0);
+
+        #test from_float_to_decimal_zero_negative
+        float src = -0.0;
+        s21_decimal dst;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.data[0], 0);
+        ck_assert_int_eq(dst.data[1], 0);
+        ck_assert_int_eq(get_sign_decimal(dst), 1);
 
