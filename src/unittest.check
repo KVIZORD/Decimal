@@ -422,4 +422,43 @@
         ck_assert_int_eq(dst.bits[2], 0);
         ck_assert_int_eq(get_sign_decimal(dst), 1);
 
+    #tcase s21_from_decimal_to_int
+
+        #test from_decimal_to_int_valid_conversion
+        int dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, 25);
+
+        #test from_decimal_to_int_overflow
+        int dst = 1;
+        s21_decimal src = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(dst, 1);
+        ck_assert_int_eq(res, 1);
+
+        #test from_decimal_to_int_negative
+        int dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, -25);
+
+        #test from_decimal_to_int_zero
+        int dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, 0);
+
+        #test from_decimal_to_int_with_exp
+        int dst;
+        s21_decimal src = {{253, 0, 0, 0}};
+        set_exp_decimal(&src, 1);
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(dst, 25);
+        ck_assert_int_eq(res, 0);
+
     
