@@ -208,9 +208,9 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   int sign_1 = get_sign_decimal(value_1);
   int sign_2 = get_sign_decimal(value_2);
   if (sign_1 == sign_2) {
-    printf("test");
     status = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
-    // status = sign_1 ? !res : res;
+  } else if (is_zero_decimal(value_1) && is_zero_decimal(value_2)) {
+    status = FALSE;
   } else {
     status = sign_1 ? TRUE : FALSE;
   }
@@ -251,6 +251,8 @@ int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
   int sign_2 = get_sign_decimal(value_2);
   if (sign_1 == sign_2) {
     status = is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+  } else if (is_zero_decimal(value_1) && is_zero_decimal(value_2)) {
+    status = TRUE;
   }
   return status;
 }
