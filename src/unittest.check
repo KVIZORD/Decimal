@@ -536,6 +536,15 @@
         ck_assert_int_eq(result.bits[0], 3);
         ck_assert_int_eq(get_sign_decimal(result), 1);
 
+        #test floor_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+
     #tcase s21_round
         #test round_positive_decimal
         s21_decimal value = {{25, 0, 0, 0}};
@@ -570,6 +579,15 @@
         ck_assert_int_eq(res, 0);
         ck_assert_int_eq(result.bits[0], 3);
         ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test round_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
 
     #tcase s21_truncate
         #test truncate_positive_decimal
@@ -606,12 +624,24 @@
         ck_assert_int_eq(result.bits[0], 2);
         ck_assert_int_eq(get_sign_decimal(result), 1);
 
+        #test truncate_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+
     #tcase s21_negate
 
         #test negate_positive_decimal
         s21_decimal value = {{25, 0, 0, 0}};
         s21_decimal result;
+        print_decimal_in_dec(result);
         int res = s21_negate(value, &result);
+        print_decimal_in_dec(value);
+        print_decimal_in_dec(result);
         ck_assert_int_eq(res, 0);
         ck_assert_int_eq(result.bits[0], 25);
         ck_assert_int_eq(get_sign_decimal(result), 1);
@@ -631,6 +661,16 @@
         int res = s21_negate(value, &result);
         ck_assert_int_eq(res, 0);
         ck_assert_int_eq(result.bits[0], 0);
-        ck_assert_int_eq(get_sign_decimal(result), 0);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test negate_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
 
 
