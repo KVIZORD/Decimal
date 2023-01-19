@@ -3,6 +3,7 @@
 #include "common/common.h"
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
+  clear_full_decimal(dst);
   int status = STATUS_OK;
   if (dst) {
     if (src < 0) {
@@ -10,20 +11,11 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
       src *= -1;
     }
     dst->bits[0] = src;
-    dst->bits[1] = 0;
-    dst->bits[2] = 0;
   } else {
     status = STATUS_ERR;
   }
 
   return status;
-}
-
-int get_exp_float(float number) {
-  int *num = (int *)(&number);
-  reset_bit_int(num, BITS_IN_INT - 1);
-  *num >>= 23;
-  return *num - 127;
 }
 
 int s21_from_decimal_to_int(s21_decimal src, int *dst) {
@@ -39,7 +31,7 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
     exp -= 1;
   }
   int num = res.bits[0];
-  if (res.bits[1] != 0 || res.bits[2] != 0 || !dst) {
+  if (src.bits[1] != 0 || src.bits[2] != 0 || !dst) {
     status = STATUS_ERR;
   }
   if (!status) {
@@ -166,7 +158,9 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   normalization_decimal(&value_1, &value_2);
   int sign_1 = get_sign_decimal(value_1);
   int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
+  if (sign_1 && sign_2) {
+    status = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+  } else if (!sign_1 && !sign_2) {
     status = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
   } else if (is_zero_decimal(value_1) && is_zero_decimal(value_2)) {
     status = FALSE;
@@ -178,20 +172,8 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
 
 // <=
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
   normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? !res : res;
-    status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-  } else if (sign_1 && !sign_2) {
-    status = TRUE;
-  } else {
-    status = FALSE;
-  }
-  return status;
+  return s21_is_less(value_1, value_2) || s21_is_equal(value_1, value_2);
 }
 
 // >

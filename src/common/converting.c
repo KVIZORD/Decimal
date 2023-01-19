@@ -84,9 +84,6 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
   Status status = STATUS_OK;
   int exp_1 = get_exp_decimal(*value_1);
   int exp_2 = get_exp_decimal(*value_2);
-  if (exp_1 > EXP_MAX || exp_2 > EXP_MAX) {
-    status = STATUS_ERR;
-  }
   if (status == STATUS_OK && exp_1 > exp_2) {
     change_exp(value_2, exp_1);
     exp_2 = get_exp_decimal(*value_2);
@@ -96,14 +93,12 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
   if (status == STATUS_OK && exp_1 < exp_2) {
     change_exp(value_1, exp_2);
     exp_1 = get_exp_decimal(*value_1);
-
     change_exp(value_2, exp_1);
     exp_2 = get_exp_decimal(*value_2);
   }
   if (exp_1 != exp_2) {
     status = STATUS_ERR;
   }
-
   return status;
 }
 
@@ -113,11 +108,11 @@ void change_exp(s21_decimal* value, int exp) {
   int exp_new = exp_old;
   for (int i = exp_old; i < exp; i++) {
     bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-    if (status) {
+    if (status || get_exp_decimal(tmp) != get_exp_decimal(*value)) {
       break;
     }
-    exp_new += 1;
     copy_decimal(tmp, value);
+    exp_new += 1;
   }
   for (int i = exp; i < exp_old; i++) {
     div_decimal_with_remainder(*value, (s21_decimal){{10, 0, 0, 0}}, value,
