@@ -73,23 +73,20 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
     if (status == STATUS_OK && exp_1 > exp_2) {
         change_exp(value_2, exp_1);
         exp_2 = get_exp_decimal(*value_2);
-        // change_exp(value_1, exp_2);
-        // exp_1 = get_exp_decimal(*value_1);
+        change_exp(value_1, exp_2);
+        exp_1 = get_exp_decimal(*value_1);
+    }
+
+    if (status == STATUS_OK && exp_1 < exp_2) {
+        change_exp(value_1, exp_2);
+        exp_1 = get_exp_decimal(*value_1);
+        change_exp(value_2, exp_1);
+        exp_2 = get_exp_decimal(*value_2);
     }
     // printf("value_1 ");
     // print_decimal_in_dec(*value_1);
     // printf("value_2 ");
     // print_decimal_in_dec(*value_2);
-    if (status == STATUS_OK && exp_1 < exp_2) {
-        change_exp(value_1, exp_2);
-        exp_1 = get_exp_decimal(*value_1);
-        // change_exp(value_2, exp_1);
-        // exp_2 = get_exp_decimal(*value_2);
-    }
-    printf("value_1 ");
-    print_decimal_in_dec(*value_1);
-    printf("value_2 ");
-    print_decimal_in_dec(*value_2);
     if (exp_1 != exp_2) {
         status = STATUS_ERR;
     }
@@ -100,31 +97,19 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
 void change_exp(s21_decimal* value, int exp) {
     s21_decimal tmp = {{0, 0, 0, 0}};
     int exp_old = get_exp_decimal(*value);
-    // int exp_new = exp_old;
+    int exp_new = exp_old;
     for (int i = exp_old; i < exp; i++) {
-        printf(" mul 10\n");
-        print_decimal_in_dec(*value);
         bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        print_decimal_in_dec(*value);
         if (status) {
             break;
         }
-        // exp_new += 1;
         copy_decimal(tmp, value);
     }
     for (int i = exp; i < exp_old; i++) {
-        printf(" div 10\n");
-        bool status = s21_div(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        copy_decimal(tmp, value);
-        if (status) {
-            break;
-        }
-        // exp_new -= 1;
-        copy_decimal(tmp, value);
+        div_decimal_with_remainder(*value, (s21_decimal){{10, 0, 0, 0}}, value, &(s21_decimal){{0,}});
+        exp_new -= 1;
     }
-    // set_exp_decimal(value, exp_new);
-    // print_decimal_in_dec(*value);
-    // printf("status = %d\n", status);
+    set_exp_decimal(value, exp_new);
 }
 
 int bank_round_decimal(s21_decimal* dst, int remainder) {

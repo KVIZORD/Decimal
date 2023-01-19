@@ -4,31 +4,35 @@
 
 #include "common/common.h"
 
-int main() {
-  s21_decimal a = {{0, 0, 0, 1 << 16}};
-  s21_decimal b = {{0, 0, 0, 0 << 16}};
-//   s21_decimal c = {{0, 0, 0,  0}};
+// int main() {
+//   s21_decimal a = {{0, 0, 0, 0 << 16}};
+//   // s21_decimal b = {{0, 0, 0, 2 << 16}};
+// //   s21_decimal c = {{0, 0, 0,  0}};
 
-  a.bits[0] = 0xffffffff;
-  a.bits[1] = 0xffffffff;
-  a.bits[2] = 0xffffffff;
-  // set_sign_decimal(&a, 1);
-//   b.bits[0] = 10;
-  b.bits[0] = 0xffffffff;
-  b.bits[1] = 0xffffffff;
-  b.bits[2] = 0xffffffff;
+//   a.bits[0] = 0xffffffff;
+//   a.bits[1] = 0xffffffff;
+//   a.bits[2] = 0xffffffff;
+//   // set_sign_decimal(&a, 1);
+// //   b.bits[0] = 10;
+//   // b.bits[0] = 0xffffffff;
+//   // b.bits[1] = 0xffffffff;
+//   // b.bits[2] = 0xffffffff;
 
-  // printf("result = %d\n", s21_mul(a, b, &c));
-    // printf("result = %d\n", s21_is_less(a, b));
-//   printf("result = %d\n", s21_mul(a, b, &c));
-  normalization_decimal(&a, &b);
+//   // printf("result = %d\n", s21_mul(a, b, &c));
+//     // printf("result = %d\n", s21_is_less(a, b));
+//     float f = 0.1111111;
+//   printf("%e\n", f);
+//   printf("%.11e\n", pow(10, -FLOAT_NUMBER_SIGNIFICANT_DIGITS - 1));
 
-  print_decimal_in_dec(a);
-  print_decimal_in_dec(b);
-//   print_decimal_in_dec(c);
+//   printf("result = %d\n", s21_from_float_to_decimal(f, &a));
+//   // change_exp(&b, 0);
 
-  return 0;
-}
+//   print_decimal_in_dec(a);
+//   // print_decimal_in_dec(b);
+// //   print_decimal_in_dec(c);
+
+//   return 0;
+// }
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   ArithmeticStatus status = OK;
@@ -248,8 +252,10 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   int sign = get_sign_float(src);
   clear_full_decimal(dst);
   set_sign_float(&src, sign);
-  float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
-                                       &mantissa, &exp);
+  if (src > pow(10, -FLOAT_NUMBER_SIGNIFICANT_DIGITS - 2)) {
+    float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
+                                         &mantissa, &exp);
+  }
   copy_ints(&mantissa, dst->bits, 0);
   while (exp > EXP_MIN && status == STATUS_OK) {
     status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);

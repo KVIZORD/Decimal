@@ -14,7 +14,8 @@
 #define BIT_EXP_END 23  // индекс бита в INT до которого хранится экспонента
 #define EXP_MAX 28  // максимальное значение экспоненты
 #define EXP_MIN 0  // минимальное значение экспоненты
-#define FLOAT_NUMBER_SIGNIFICANT_DIGITS 7  // кол-во значимых цифр копируемых из float в decimal
+#define FLOAT_NUMBER_SIGNIFICANT_DIGITS \
+  7  // кол-во значимых цифр копируемых из float в decimal
 
 typedef struct {
   int bits[1 + INTS_IN_DECIMAL];
