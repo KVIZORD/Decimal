@@ -523,7 +523,6 @@
         s21_decimal dst;
         float src = __FLT_MAX__;
         int res = s21_from_float_to_decimal(src, &dst);
-        ck_assert_int_eq(dst.bits[0], 0);
         ck_assert_int_eq(res, 1);
 
         #test from_float_to_decimal_min

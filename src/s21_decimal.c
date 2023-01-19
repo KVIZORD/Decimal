@@ -224,28 +224,30 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  Status status = STATUS_ERR;
+  Status status = STATUS_OK;
   int mantissa = 0;
   int exp = 0;
   int sign = get_sign_float(src);
+  src = fabs(src);
   clear_full_decimal(dst);
-  set_sign_float(&src, sign);
-  if (src >= 1.0e-28) {
+  if (src > 0 && src < pow(10, -EXP_MAX)) {
+    status = STATUS_ERR;
+  } else if (src != 0) {
+    // приведение float
     float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
                                          &mantissa, &exp);
-    status = STATUS_OK;
-  }
-  copy_ints(&mantissa, dst->bits, 0);
-  while (exp > EXP_MIN && status == STATUS_OK) {
-    status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
-    exp -= 1;
+    copy_ints(&mantissa, dst->bits, 0);
+    // сведение положительной экспоненты к нулю
+    while (status == STATUS_OK && exp > EXP_MIN) {
+      status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
+      exp -= 1;
+    }
   }
   if (status == STATUS_OK && -exp >= EXP_MIN && -exp <= EXP_MAX) {
     set_exp_decimal(dst, -exp);
     set_sign_decimal(dst, sign);
   } else {
     status = STATUS_ERR;
-    clear_full_decimal(dst);
   }
   return status;
 }

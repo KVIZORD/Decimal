@@ -37,14 +37,12 @@ $(MAIN_FILE).a: $(MAIN_FILE).o common.o
 	ranlib $(MAIN_FILE).a
 	rm -rf *.o
 
-
 gcov_report: 
 	gcc -o $(TEST) $(TEST).c common/*.c $(MAIN_FILE).c $(LIBS) $(LDFLAGS)
 	./$(TEST)
 	lcov --capture --directory . --output-file s21_coverage.info
 	genhtml s21_coverage.info --output-directory s21_lcov_report
 	open ./s21_lcov_report/index.html
-
 
 test: clean $(MAIN_FILE).a autotest
 	$(CC) $(CFLAGS) -o $(TEST) $(TEST).c $(MAIN_FILE).a $(LIBS)
