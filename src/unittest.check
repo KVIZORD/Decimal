@@ -475,7 +475,8 @@
         float dst;
         s21_decimal src = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         int res = s21_from_decimal_to_float(src, &dst);
-        ck_assert_int_eq(res, 1);
+        ck_assert_float_eq(dst, 39614081257132168796771975168.0);
+        ck_assert_int_eq(res, 0);
 
         #test from_decimal_to_float_negative
         float dst;
@@ -505,10 +506,11 @@
         #test from_float_to_decimal_normal
         s21_decimal dst;
         float src = 25.5;
+        float dst_2;
         int res = s21_from_float_to_decimal(src, &dst);
+        s21_from_decimal_to_float(dst, &dst_2);
         ck_assert_int_eq(res, 0);
-        ck_assert_int_eq(dst.bits[0], 25);
-        ck_assert_int_eq(get_exp_decimal(dst), 1);
+        ck_assert_float_eq(src, dst_2);
 
         #test from_float_to_decimal_greater_7_digits
         s21_decimal dst;
@@ -535,11 +537,11 @@
         #test from_float_to_decimal_negative
         s21_decimal dst;
         float src = -25.5;
+        float dst_2;
         int res = s21_from_float_to_decimal(src, &dst);
+        s21_from_decimal_to_float(dst, &dst_2);
         ck_assert_int_eq(res, 0);
-        ck_assert_int_eq(dst.bits[0], 25);
-        ck_assert_int_eq(get_exp_decimal(dst), 1);
-        ck_assert_int_eq(get_sign_decimal(dst), 1);
+        ck_assert_float_eq(src, dst_2);
 
         //#test from_float_to_decimal_zero
         //s21_decimal dst;

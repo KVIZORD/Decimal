@@ -186,6 +186,8 @@ int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
     int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
     status = sign_1 ? !res : res;
     status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+  } else if (sign_1 && !sign_2) {
+    status = TRUE;
   } else {
     status = FALSE;
   }
@@ -280,7 +282,7 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
     div_decimal_with_remainder(value, then, &value, &remainder);
   }
   set_exp_decimal(&value, exp);
-  if (get_sign_decimal(value)) {
+  if (get_sign_decimal(value) && !is_zero_decimal(remainder)) {
     s21_decimal one = {{1, 0, 0, 0}};
     set_sign_decimal(&one, true);
     s21_add(value, one, &value);
