@@ -1,35 +1,36 @@
 #include "s21_decimal.h"
 
+#include <limits.h>
 #include <math.h>
 
 #include "common/common.h"
 
 // int main() {
-//   s21_decimal a = {{0, 0, 0, 0 << 16}};
-//   // s21_decimal b = {{0, 0, 0, 2 << 16}};
-// //   s21_decimal c = {{0, 0, 0,  0}};
+//   int int_1 = 756485;
+//   int int_2 = 537564879;
+//   s21_decimal a = {{int_1, 0, 0, 0}};
+//   s21_decimal b = {{int_2, 0, 0, 1 << 31}};
+//   s21_decimal c = {{0, 0, 0, 0}};
 
-//   a.bits[0] = 0xffffffff;
-//   a.bits[1] = 0xffffffff;
-//   a.bits[2] = 0xffffffff;
+//   // a.bits[0] = 0xffffffff;
+//   // a.bits[1] = 0xffffffff;
+//   // a.bits[2] = 0xffffffff;
 //   // set_sign_decimal(&a, 1);
-// //   b.bits[0] = 10;
+//   //   b.bits[0] = 10;
 //   // b.bits[0] = 0xffffffff;
 //   // b.bits[1] = 0xffffffff;
 //   // b.bits[2] = 0xffffffff;
 
-//   // printf("result = %d\n", s21_mul(a, b, &c));
-//     // printf("result = %d\n", s21_is_less(a, b));
-//     float f = 0.1111111;
-//   printf("%e\n", f);
-//   printf("%.11e\n", pow(10, -FLOAT_NUMBER_SIGNIFICANT_DIGITS - 1));
+//   // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
+//   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
+//   // int r = s21_add(val_1, val_2, &res);
 
-//   printf("result = %d\n", s21_from_float_to_decimal(f, &a));
-//   // change_exp(&b, 0);
+//   printf("result = %d\n", s21_add(a, b, &c));
+//   // printf("result = %d\n", s21_is_less(a, b));
 
 //   print_decimal_in_dec(a);
-//   // print_decimal_in_dec(b);
-// //   print_decimal_in_dec(c);
+//   print_decimal_in_dec(b);
+//   print_decimal_in_dec(c);
 
 //   return 0;
 // }
@@ -51,9 +52,11 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       // print_double_decimal_in_dec(res);
       status = double_decimal_to_decimal(res, result);
     } else if (sign_1) {
+      // printf("sign_1\n");
       set_sign_decimal(&value_1, false);
       status = s21_sub(value_2, value_1, result);
     } else if (sign_2) {
+      // printf("sign_2\n");
       set_sign_decimal(&value_2, false);
       status = s21_sub(value_1, value_2, result);
     }
@@ -67,7 +70,11 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int sign_1 = get_sign_decimal(value_1);
     int sign_2 = get_sign_decimal(value_2);
     int exp = get_exp_decimal(value_1);
-    if (sign_1 == sign_2) {
+
+    if (sign_1 == sign_2 && s21_is_less(value_1, value_2)) {
+      status = s21_sub(value_2, value_1, result);
+      set_sign_decimal(result, !sign_1);
+    } else if (sign_1 == sign_2) {
       s21_double_decimal res = {
           0,
       };
@@ -76,6 +83,7 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       set_exp_double_decimal(&res, exp);
       convert_decimal_to_twos_complement(&value_2);
       sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
+      res.bits[INTS_IN_DECIMAL] = 0;
       status = double_decimal_to_decimal(res, result);
     } else if (sign_1) {
       set_sign_decimal(&value_2, true);
@@ -250,24 +258,29 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   int mantissa = 0;
   int exp = 0;
   int sign = get_sign_float(src);
+  src = fabs(src);
   clear_full_decimal(dst);
-  set_sign_float(&src, sign);
-  if (src > pow(10, -FLOAT_NUMBER_SIGNIFICANT_DIGITS - 2)) {
+  printf("%e\n", src);
+  if (src > 0 && src < pow(10, -EXP_MAX)) {
+    status = STATUS_ERR;
+  } else if (src != 0) {
+    // приведение float
     float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
                                          &mantissa, &exp);
-  }
-  copy_ints(&mantissa, dst->bits, 0);
-  while (exp > EXP_MIN && status == STATUS_OK) {
-    status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
-    exp -= 1;
+    copy_ints(&mantissa, dst->bits, 0);
+    // сведение положительной экспоненты к нулю
+    while (status == STATUS_OK && exp > EXP_MIN) {
+      status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
+      exp -= 1;
+    }
   }
   if (status == STATUS_OK && -exp >= EXP_MIN && -exp <= EXP_MAX) {
     set_exp_decimal(dst, -exp);
     set_sign_decimal(dst, sign);
   } else {
     status = STATUS_ERR;
-    clear_full_decimal(dst);
   }
+
   return status;
 }
 

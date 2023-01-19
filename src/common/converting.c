@@ -83,10 +83,6 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
         change_exp(value_2, exp_1);
         exp_2 = get_exp_decimal(*value_2);
     }
-    // printf("value_1 ");
-    // print_decimal_in_dec(*value_1);
-    // printf("value_2 ");
-    // print_decimal_in_dec(*value_2);
     if (exp_1 != exp_2) {
         status = STATUS_ERR;
     }
@@ -98,12 +94,13 @@ void change_exp(s21_decimal* value, int exp) {
     s21_decimal tmp = {{0, 0, 0, 0}};
     int exp_old = get_exp_decimal(*value);
     int exp_new = exp_old;
-    for (int i = exp_old; i < exp; i++) {
+    for (int i = exp_old; i < exp ; i++) {
         bool status = s21_mul(*value, (s21_decimal){{10, 0, 0, 0}}, &tmp);
-        if (status) {
+        if (status || get_exp_decimal(tmp) != get_exp_decimal(*value)) {
             break;
         }
         copy_decimal(tmp, value);
+        exp_new += 1;
     }
     for (int i = exp; i < exp_old; i++) {
         div_decimal_with_remainder(*value, (s21_decimal){{10, 0, 0, 0}}, value, &(s21_decimal){{0,}});
@@ -123,7 +120,6 @@ int bank_round_decimal(s21_decimal* dst, int remainder) {
         if (last_number.bits[0] % 2) {
             sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
             status = double_decimal_to_decimal(res, dst);
-
         }
     } else if (remainder > 5) {
         sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
