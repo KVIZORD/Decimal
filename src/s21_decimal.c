@@ -5,27 +5,29 @@
 #include "common/common.h"
 
 int main() {
-    s21_decimal a = {{0, 0, 0, 1 << 16}};
-    s21_decimal b = {{0, 0, 0,  2 << 16}};
-    // s21_decimal c = {{0, 0, 0,  0}};
+  s21_decimal a = {{0, 0, 0, 1 << 16}};
+  s21_decimal b = {{0, 0, 0, 0 << 16}};
+//   s21_decimal c = {{0, 0, 0,  0}};
 
-    a.bits[0] = 0xffffffff;
-    a.bits[1] = 0xffffffff;
-    a.bits[2] = 0xffffffff;
-    // set_sign_decimal(&a, 1);
-    b.bits[0] = 0xffffffff;
-    b.bits[1] = 0xffffffff;
-    b.bits[2] = 0xffffffff;
+  a.bits[0] = 0xffffffff;
+  a.bits[1] = 0xffffffff;
+  a.bits[2] = 0xffffffff;
+  // set_sign_decimal(&a, 1);
+//   b.bits[0] = 10;
+  b.bits[0] = 0xffffffff;
+  b.bits[1] = 0xffffffff;
+  b.bits[2] = 0xffffffff;
 
+  // printf("result = %d\n", s21_mul(a, b, &c));
+    // printf("result = %d\n", s21_is_less(a, b));
+//   printf("result = %d\n", s21_mul(a, b, &c));
+  normalization_decimal(&a, &b);
 
-    // printf("result = %d\n", s21_mul(a, b, &c));
-    printf("result = %d\n", s21_is_less(a, b));
+  print_decimal_in_dec(a);
+  print_decimal_in_dec(b);
+//   print_decimal_in_dec(c);
 
-    print_decimal_in_dec(a);
-    print_decimal_in_dec(b);
-    // print_decimal_in_dec(c);
-
-    return 0;
+  return 0;
 }
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
@@ -145,8 +147,8 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   CompareStatus status = TRUE;
   normalization_decimal(&value_1, &value_2);
-  print_decimal_in_dec(value_1);
-  print_decimal_in_dec(value_2);
+  //   print_decimal_in_dec(value_1);
+  //   print_decimal_in_dec(value_2);
   int sign_1 = get_sign_decimal(value_1);
   int sign_2 = get_sign_decimal(value_2);
   if (sign_1 == sign_2) {
@@ -222,6 +224,23 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
   return !s21_is_equal(value_1, value_2);
 }
 
+int s21_from_int_to_decimal(int src, s21_decimal *dst) {
+  int status = STATUS_OK;
+  if (dst) {
+    if (src < 0) {
+      set_sign_decimal(dst, 1);
+      src *= -1;
+    }
+    dst->bits[0] = src;
+    dst->bits[1] = 0;
+    dst->bits[2] = 0;
+  } else {
+    status = STATUS_ERR;
+  }
+
+  return status;
+}
+
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   Status status = STATUS_OK;
   int mantissa = 0;
@@ -242,6 +261,28 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   } else {
     status = STATUS_ERR;
     clear_full_decimal(dst);
+  }
+  return status;
+}
+
+int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+  s21_decimal res = src;
+  s21_decimal ten = {{10, 0, 0, 0}};
+  int status = STATUS_OK;
+  int exp = get_exp_decimal(src);
+  while (exp != 0) {
+    div_decimal_with_remainder(res, ten, &res,
+                               &(s21_decimal){
+                                   0,
+                               });
+    exp -= 1;
+  }
+  int num = res.bits[0];
+  if (res.bits[1] != 0 || res.bits[2] != 0 || !dst) {
+    status = STATUS_ERR;
+  }
+  if (!status) {
+    *dst = get_sign_decimal(res) ? num * -1 : num;
   }
   return status;
 }
