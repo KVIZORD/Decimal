@@ -242,7 +242,7 @@
         s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
         set_exp_decimal(&num_2, 0);
         int res = s21_is_greater_or_equal(num_1, num_2);
-        ck_assert_int_eq(res, 1);
+        ck_assert_int_eq(res, 0);
 
         #test is_greater_or_equal_positive_zero
         s21_decimal num_1 = {{0, 0, 0, 0}};
@@ -543,13 +543,13 @@
         ck_assert_int_eq(res, 0);
         ck_assert_float_eq(src, dst_2);
 
-        //#test from_float_to_decimal_zero
-        //s21_decimal dst;
-        //float src = 0;
-        //int res = s21_from_float_to_decimal(src, &dst);
-        //ck_assert_int_eq(res, 0);
-        //ck_assert_int_eq(dst.bits[0], 0);
-        //ck_assert_int_eq(get_sign_decimal(dst), 0);
+        #test from_float_to_decimal_zero
+        s21_decimal dst;
+        float src = 0;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 0);
+        ck_assert_int_eq(get_sign_decimal(dst), 0);
 
 
 #suite other

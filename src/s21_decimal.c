@@ -224,14 +224,17 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
 }
 
 int s21_from_float_to_decimal(float src, s21_decimal *dst) {
-  Status status = STATUS_OK;
+  Status status = STATUS_ERR;
   int mantissa = 0;
   int exp = 0;
   int sign = get_sign_float(src);
   clear_full_decimal(dst);
   set_sign_float(&src, sign);
-  float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
-                                       &mantissa, &exp);
+  if (src >= 1.0e-28) {
+    float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
+                                         &mantissa, &exp);
+    status = STATUS_OK;
+  }
   copy_ints(&mantissa, dst->bits, 0);
   while (exp > EXP_MIN && status == STATUS_OK) {
     status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
