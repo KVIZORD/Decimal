@@ -2,7 +2,6 @@
 #include "common/common.h"
 
 #include <check.h>
-#include <limits.h>
 
 #suite comparison
     #tcase s21_is_less
@@ -25,8 +24,8 @@
         ck_assert_int_eq(res, 0);
 
         #test is_less_nums_max_decimal
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         int res = s21_is_less(num_1, num_2);
         ck_assert_int_eq(res, 0);
 
@@ -39,9 +38,9 @@
         ck_assert_int_eq(res, 1);
 
         #test is_less_nums_max_decimal_with_exp
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_1, 1);
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_2, 0);
         int res = s21_is_less(num_1, num_2);
         ck_assert_int_eq(res, 1);
@@ -88,15 +87,15 @@
         ck_assert_int_eq(res, 1);
 
         #test is_less_or_equal_nums_max_decimal
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         int res = s21_is_less_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
 
         #test is_less_or_equal_first_equal_with_exp
-        s21_decimal num_1 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_1, 5);
-        s21_decimal num_2 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_2, 5);
         int res = s21_is_less_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
@@ -110,13 +109,13 @@
 
         #test is_less_or_equal_second_negative
         s21_decimal num_1 = {{1, 0, 0, 0}};
-        s21_decimal num_2 = {{0, 0, 0, INT_MIN}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
         int res = s21_is_less_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 0);
 
         #test is_less_or_equal_both_negative
-        s21_decimal num_1 = {{0, 0, 0, INT_MIN}};
-        s21_decimal num_2 = {{0, 0, 0, INT_MIN}};
+        s21_decimal num_1 = {{0, 0, 0, -__INT_MAX__}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
         int res = s21_is_less_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
 
@@ -140,15 +139,15 @@
         ck_assert_int_eq(res, 0);
 
         #test is_greater_nums_max_decimal
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         int res = s21_is_greater(num_1, num_2);
         ck_assert_int_eq(res, 0);
 
         #test is_greater_nums_with_exp
-        s21_decimal num_1 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_1, 0);
-        s21_decimal num_2 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_2, 5);
         int res = s21_is_greater(num_1, num_2);
         ck_assert_int_eq(res, 1);
@@ -176,9 +175,9 @@
         ck_assert_int_eq(res, 0);
 
         #test is_greater_nums_max_decimal_with_exp
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_1, 1);
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_2, 0);
         int res = s21_is_greater(num_1, num_2);
         ck_assert_int_eq(res, 0);
@@ -217,29 +216,29 @@
         ck_assert_int_eq(res, 1);
 
         #test is_greater_or_equal_both_negative
-        s21_decimal num_1 = {{0, 0, 0, INT_MIN}};
-        s21_decimal num_2 = {{0, 0, 0, INT_MIN}};
+        s21_decimal num_1 = {{0, 0, 0, -__INT_MAX__}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
         int res = s21_is_greater_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
 
         #test is_greater_or_equal_nums_max_decimal
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         int res = s21_is_greater_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
 
         #test is_greater_or_equal_nums_with_exp
-        s21_decimal num_1 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_1, 0);
-        s21_decimal num_2 = {{INT_MAX, 0, 0, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
         set_exp_decimal(&num_2, 5);
         int res = s21_is_greater_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 1);
 
         #test is_greater_or_equal_nums_max_decimal_with_exp
-        s21_decimal num_1 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_1, 1);
-        s21_decimal num_2 = {{INT_MAX, INT_MAX, INT_MAX, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
         set_exp_decimal(&num_2, 0);
         int res = s21_is_greater_or_equal(num_1, num_2);
         ck_assert_int_eq(res, 0);
@@ -393,20 +392,20 @@
 
         #test from_int_to_decimal_min_int
         s21_decimal dst = {{0, 0, 0, 0}};
-        int src = INT_MIN;
+        int src = -__INT_MAX__;
         int res = s21_from_int_to_decimal(src, &dst);
         ck_assert_int_eq(res, 0);
-        ck_assert_int_eq(dst.bits[0], INT_MIN);
+        ck_assert_int_eq(dst.bits[0], __INT_MAX__);
         ck_assert_int_eq(dst.bits[1], 0);
         ck_assert_int_eq(dst.bits[2], 0);
-        ck_assert_int_eq(dst.bits[3], INT_MIN);
+        ck_assert_int_eq(get_sign_decimal(dst), 1);
 
         #test from_int_to_decimal_max_int
         s21_decimal dst = {{0, 0, 0, 0}};
-        int src = INT_MAX;
+        int src = __INT_MAX__;
         int res = s21_from_int_to_decimal(src, &dst);
         ck_assert_int_eq(res, 0);
-        ck_assert_int_eq(dst.bits[0], INT_MAX);
+        ck_assert_int_eq(dst.bits[0], __INT_MAX__);
         ck_assert_int_eq(dst.bits[1], 0);
         ck_assert_int_eq(dst.bits[2], 0);
         ck_assert_int_eq(dst.bits[3], 0);
