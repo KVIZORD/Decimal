@@ -6,17 +6,15 @@
 #include "common/common.h"
 
 // int main() {
-//   int int_1 = 756485;
-//   int int_2 = 537564879;
-//   s21_decimal a = {{int_1, 0, 0, 0}};
-//   s21_decimal b = {{int_2, 0, 0, 1 << 31}};
+//   s21_decimal a = {{0, 0, 0, 1 << 16}};
+//   s21_decimal b = {{0, 0, 0, 1 << 16}};
 //   s21_decimal c = {{0, 0, 0, 0}};
 
-//   // a.bits[0] = 0xffffffff;
-//   // a.bits[1] = 0xffffffff;
-//   // a.bits[2] = 0xffffffff;
+//   a.bits[0] = 0xffffffff;
+//   a.bits[1] = 0xffffffff;
+//   a.bits[2] = 0xffffffff;
 //   // set_sign_decimal(&a, 1);
-//   //   b.bits[0] = 10;
+//   b.bits[0] = 11;
 //   // b.bits[0] = 0xffffffff;
 //   // b.bits[1] = 0xffffffff;
 //   // b.bits[2] = 0xffffffff;
@@ -25,7 +23,7 @@
 //   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
 //   // int r = s21_add(val_1, val_2, &res);
 
-//   printf("result = %d\n", s21_add(a, b, &c));
+//   printf("result = %d\n", s21_add(b, a, &c));
 //   // printf("result = %d\n", s21_is_less(a, b));
 
 //   print_decimal_in_dec(a);
@@ -45,6 +43,8 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       s21_double_decimal res = {
           0,
       };
+      // print_decimal_in_dec(value_1);
+      // print_decimal_in_dec(value_2);
       set_sign_decimal(result, sign_1);
       set_sign_double_decimal(&res, sign_1);
       set_exp_double_decimal(&res, exp);
@@ -58,6 +58,8 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     } else if (sign_2) {
       // printf("sign_2\n");
       set_sign_decimal(&value_2, false);
+      // print_decimal_in_dec(value_1);
+      // print_decimal_in_dec(value_2);
       status = s21_sub(value_1, value_2, result);
     }
   }
@@ -71,7 +73,11 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     int sign_2 = get_sign_decimal(value_2);
     int exp = get_exp_decimal(value_1);
 
-    if (sign_1 == sign_2 && s21_is_less(value_1, value_2)) {
+    if (is_zero_decimal(value_1)) {
+      s21_negate(value_2, result);
+    } else if (is_zero_decimal(value_2)) {
+      copy_decimal(value_1, result);
+    } else if (sign_1 == sign_2 && s21_is_less(value_1, value_2)) {
       status = s21_sub(value_2, value_1, result);
       set_sign_decimal(result, !sign_1);
     } else if (sign_1 == sign_2) {
@@ -397,5 +403,6 @@ int s21_truncate(s21_decimal value, s21_decimal *result) {
 }
 
 int s21_negate(s21_decimal value, s21_decimal *result) {
+  copy_decimal(value, result);
   return !set_sign_decimal(result, !get_sign_decimal(value));
 }
