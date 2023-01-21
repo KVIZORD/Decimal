@@ -60,20 +60,28 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 }
 
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
+  // printf("================================\n");
   ArithmeticStatus status = OK;
   if (!normalization_decimal(&value_1, &value_2)) {
     int sign_1 = get_sign_decimal(value_1);
     int sign_2 = get_sign_decimal(value_2);
     int exp = get_exp_decimal(value_1);
-
     if (is_zero_decimal(value_1)) {
+      // printf("1\n");
       s21_negate(value_2, result);
     } else if (is_zero_decimal(value_2)) {
+      // printf("2\n");
       copy_decimal(value_1, result);
-    } else if (sign_1 == sign_2 && s21_is_less(value_1, value_2)) {
+    } else if (sign_1 && sign_2 && s21_is_greater(value_1, value_2)) {
+      // printf("3\n");
+      status = s21_sub(value_2, value_1, result);
+      set_sign_decimal(result, !sign_1);
+    } else if (!sign_1 && !sign_2 && s21_is_less(value_1, value_2)) {
+      // printf("4\n");
       status = s21_sub(value_2, value_1, result);
       set_sign_decimal(result, !sign_1);
     } else if (sign_1 == sign_2) {
+      // printf("5\n");
       s21_double_decimal res = {
           0,
       };
@@ -83,11 +91,14 @@ int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       convert_decimal_to_twos_complement(&value_2);
       sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
       res.bits[INTS_IN_DECIMAL] = 0;
+      // print_double_decimal_in_dec(res);
       status = double_decimal_to_decimal(res, result);
     } else if (sign_1) {
+      // printf("6\n");
       set_sign_decimal(&value_2, true);
       status = s21_add(value_1, value_2, result);
     } else if (sign_2) {
+      // printf("7\n");
       set_sign_decimal(&value_2, false);
       status = s21_add(value_1, value_2, result);
     }
