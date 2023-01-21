@@ -26,23 +26,23 @@ decimal:
 	$(CC) $(CFLAGS) -o $(MAIN_FILE) $(MAIN_FILE).c common/*.c $(LIBS)
 	./$(MAIN_FILE)
 
+common.o: common/*.c common/common.h
+	$(CC) $(CFLAGS) -c common/*.c 
+
 $(MAIN_FILE).o: $(MAIN_FILE).c $(MAIN_FILE).h 
 	$(CC) $(CFLAGS) -c $(MAIN_FILE).c 
-
-common.o: common/*.c common/common.h 
-	$(CC) $(CFLAGS) -c common/*.c 
 
 $(MAIN_FILE).a: $(MAIN_FILE).o common.o
 	ar rc $(MAIN_FILE).a $(MAIN_FILE).o *.o
 	ranlib $(MAIN_FILE).a
+	rm -rf *.o
 
-gcov_report:
-	gcc -o $(TEST) $(TEST).c $(MAIN_FILE).c $(LIBS) $(LDFLAGS)
+gcov_report: 
+	gcc -o $(TEST) $(TEST).c common/*.c $(MAIN_FILE).c $(LIBS) $(LDFLAGS)
 	./$(TEST)
 	lcov --capture --directory . --output-file s21_coverage.info
 	genhtml s21_coverage.info --output-directory s21_lcov_report
 	open ./s21_lcov_report/index.html
-
 
 test: clean $(MAIN_FILE).a autotest
 	$(CC) $(CFLAGS) -o $(TEST) $(TEST).c $(MAIN_FILE).a $(LIBS)
@@ -59,6 +59,8 @@ clean:
 	rm -rf *.gch *.a *.out *.gcda *.gcno *.o
 	rm -rf valgrind_log*
 	rm -rf test test.c $(TEST)
+	rm -rf s21_lcov_report
+	rm -rf *.info
 
 valgrind:
 	valgrind --trace-children=yes --track-fds=yes --leak-check=yes --show-leak-kinds=all --track-origins=yes --verbose --log-file=valgrind_log.txt ./$(TEST) 
@@ -68,4 +70,4 @@ autotest: $(MAIN_FILE).a
 	clang-format --style=Google -i *.c *.h
 
 format:
-	clang-format --style=Google -i *.c *.h
+	clang-format --style=Google -i *.c *.h common/*.c

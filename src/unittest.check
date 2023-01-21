@@ -3,6 +3,735 @@
 
 #include <check.h>
 
+#suite comparison
+    #tcase s21_is_less
+        #test is_less_first_less
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_first_not_less
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_nums_zeroes
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_nums_max_decimal
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_nums_with_exp
+        s21_decimal num_1 = {{25, 0, 0, 0}};
+        set_exp_decimal(&num_1, 1);
+        s21_decimal num_2 = {{25, 0, 0, 0}};
+        set_exp_decimal(&num_2, 0);
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_nums_max_decimal_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_1, 1);
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_2, 0);
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_first_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_second_negative
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_both_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_less(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+    #tcase s21_is_less_or_equal
+        #test is_less_or_equal_first_less
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_or_equal_first_not_less
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_or_equal_first_equal
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_or_equal_nums_max_decimal
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_or_equal_first_equal_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_1, 5);
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_2, 5);
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_or_equal_first_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_less_or_equal_second_negative
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_less_or_equal_both_negative
+        s21_decimal num_1 = {{0, 0, 0, -__INT_MAX__}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
+        int res = s21_is_less_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+    #tcase s21_is_greater
+        #test is_greater_first_greater
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_first_not_greater
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_first_equal
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_nums_max_decimal
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_nums_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_1, 0);
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_2, 5);
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_first_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_second_negative
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_both_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_nums_max_decimal_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_1, 1);
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_2, 0);
+        int res = s21_is_greater(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+
+    #test is_greater_or_equal_first_greater
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_first_not_greater
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_or_equal_first_equal
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_first_negative
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_or_equal_second_negative
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_both_negative
+        s21_decimal num_1 = {{0, 0, 0, -__INT_MAX__}};
+        s21_decimal num_2 = {{0, 0, 0, -__INT_MAX__}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_nums_max_decimal
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_nums_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_1, 0);
+        s21_decimal num_2 = {{__INT_MAX__, 0, 0, 0}};
+        set_exp_decimal(&num_2, 5);
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_nums_max_decimal_with_exp
+        s21_decimal num_1 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_1, 1);
+        s21_decimal num_2 = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&num_2, 0);
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_greater_or_equal_positive_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_greater_or_equal_positive_zero_and_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_greater_or_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+    #tcase is_equal
+        #test is_equal_positive_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_equal_negative_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_equal_positive_and_negative_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_equal_positive_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_equal_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_equal_positive_zero_and_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_equal_nums_with_exp
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        set_exp_decimal(&num_1, 5);
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        set_exp_decimal(&num_2, 5);
+        int res = s21_is_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+    #tcase s21_is_not_equal
+
+        #test is_not_equal_positive_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{2, 0, 0, 0}};
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_not_equal_negative_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{2, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_not_equal_positive_and_negative_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 1);
+
+        #test is_not_equal_equal_nums
+        s21_decimal num_1 = {{1, 0, 0, 0}};
+        s21_decimal num_2 = {{1, 0, 0, 0}};
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_not_equal_positive_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_not_equal_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_1, 1);
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+        #test is_not_equal_positive_zero_and_negative_zero
+        s21_decimal num_1 = {{0, 0, 0, 0}};
+        s21_decimal num_2 = {{0, 0, 0, 0}};
+        set_sign_decimal(&num_2, 1);
+        int res = s21_is_not_equal(num_1, num_2);
+        ck_assert_int_eq(res, 0);
+
+
+#suite convertors
+
+    #tcase s21_from_int_to_decimal
+
+        #test from_int_to_decimal_normal
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = 1234567;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 1234567);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
+
+        #test from_int_to_decimal_zero
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = 0;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 0);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
+
+        #test from_int_to_decimal_min_int
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = -__INT_MAX__;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], __INT_MAX__);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(get_sign_decimal(dst), 1);
+
+        #test from_int_to_decimal_max_int
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = __INT_MAX__;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], __INT_MAX__);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(dst.bits[3], 0);
+
+        #test from_int_to_decimal_negative
+        s21_decimal dst = {{0, 0, 0, 0}};
+        int src = -1;
+        int res = s21_from_int_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 1);
+        ck_assert_int_eq(dst.bits[1], 0);
+        ck_assert_int_eq(dst.bits[2], 0);
+        ck_assert_int_eq(get_sign_decimal(dst), 1);
+
+    #tcase s21_from_decimal_to_int
+
+        #test from_decimal_to_int_valid_conversion
+        int dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, 25);
+
+        #test from_decimal_to_int_overflow
+        int dst = 1;
+        s21_decimal src = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(dst, 1);
+        ck_assert_int_eq(res, 1);
+
+        #test from_decimal_to_int_negative
+        int dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, -25);
+
+        #test from_decimal_to_int_zero
+        int dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst, 0);
+
+        #test from_decimal_to_int_with_exp
+        int dst;
+        s21_decimal src = {{253, 0, 0, 0}};
+        set_exp_decimal(&src, 1);
+        int res = s21_from_decimal_to_int(src, &dst);
+        ck_assert_int_eq(dst, 25);
+        ck_assert_int_eq(res, 0);
+
+
+    #tcase s21_from_decimal_to_float
+
+        #test from_decimal_to_float_valid
+        float dst;
+        s21_decimal src = {{100, 0, 0, 0}};
+        set_exp_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 10.0);
+
+        #test from_decimal_to_float_overflow
+        float dst;
+        s21_decimal src = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_float_eq(dst, 39614081257132168796771975168.0);
+        ck_assert_int_eq(res, 0);
+
+        #test from_decimal_to_float_negative
+        float dst;
+        s21_decimal src = {{25, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, -25.0f);
+
+        #test from_decimal_to_float_zero
+        float dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 0.0f);
+
+        #test from_decimal_to_float_negative_zero
+        float dst;
+        s21_decimal src = {{0, 0, 0, 0}};
+        set_sign_decimal(&src, 1);
+        int res = s21_from_decimal_to_float(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(dst, 0.0);
+
+    #tcase s21_from_float_to_decimal
+
+        #test from_float_to_decimal_normal
+        s21_decimal dst;
+        float src = 25.5;
+        float dst_2;
+        int res = s21_from_float_to_decimal(src, &dst);
+        s21_from_decimal_to_float(dst, &dst_2);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(src, dst_2);
+
+        #test from_float_to_decimal_greater_7_digits
+        s21_decimal dst;
+        float src = 2.5555555;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 2555556);
+        ck_assert_int_eq(get_exp_decimal(dst), 6);
+
+        #test from_float_to_decimal_overflow
+        s21_decimal dst;
+        float src = __FLT_MAX__;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 1);
+
+        #test from_float_to_decimal_min
+        s21_decimal dst;
+        float src = __FLT_MIN__;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(dst.bits[0], 0);
+        ck_assert_int_eq(res, 1);
+
+        #test from_float_to_decimal_negative
+        s21_decimal dst;
+        float src = -25.5;
+        float dst_2;
+        int res = s21_from_float_to_decimal(src, &dst);
+        s21_from_decimal_to_float(dst, &dst_2);
+        ck_assert_int_eq(res, 0);
+        ck_assert_float_eq(src, dst_2);
+
+        #test from_float_to_decimal_zero
+        s21_decimal dst;
+        float src = 0;
+        int res = s21_from_float_to_decimal(src, &dst);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(dst.bits[0], 0);
+        ck_assert_int_eq(get_sign_decimal(dst), 0);
+
+
+#suite other
+    #tcase s21_floor
+        #test floor_positive_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+
+        #test floor_negative_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test floor_positive_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 2);
+
+        #test floor_negative_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 3);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test floor_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_floor(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+
+    #tcase s21_round
+        #test round_positive_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+
+        #test round_negative_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test round_positive_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 3);
+
+        #test round_negative_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 3);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test round_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_round(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+
+    #tcase s21_truncate
+        #test truncate_positive_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+
+        #test truncate_negative_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test truncate_positive_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 2);
+
+        #test truncate_negative_decimal_with_exp
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 2);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test truncate_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_truncate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+
+    #tcase s21_negate
+
+        #test negate_positive_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test negate_negative_decimal
+        s21_decimal value = {{25, 0, 0, 0}};
+        set_sign_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 25);
+        ck_assert_int_eq(get_sign_decimal(result), 0);
+
+        #test negate_zero
+        s21_decimal value = {{0, 0, 0, 0}};
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], 0);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test negate_positive_decimal_max
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
+        #test negate_positive_decimal_max_with_exp
+        s21_decimal value = {{__INT_MAX__, __INT_MAX__, __INT_MAX__, 0}};
+        set_exp_decimal(&value, 1);
+        s21_decimal result;
+        int res = s21_negate(value, &result);
+        ck_assert_int_eq(res, 0);
+        ck_assert_int_eq(result.bits[0], __INT_MAX__);
+        ck_assert_int_eq(result.bits[1], __INT_MAX__);
+        ck_assert_int_eq(result.bits[2], __INT_MAX__);
+        ck_assert_int_eq(get_exp_decimal(value), 1);
+        ck_assert_int_eq(get_sign_decimal(result), 1);
+
 
 #suite arithmetic_add
     #tcase s21_add_func__zero
@@ -476,65 +1205,89 @@
             ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
             ck_assert_int_eq(res.bits[3], (int)0x00000000);
 
-#suite arithmetic_sub
-//    #tcase s21_add_func__error
-//        #test error_pos_inf_1
-//            // 79228162514264337593543950335 + 0.1 = -
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b1,
-//                0b0,
-//                0b0,
-//                0x00000000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b1001,
-//                0b0,
-//                0b0,
-//                0x00010000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_add(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 1);
-//            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
-//            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//    
-//        #tcase s21_add_func__zero
-//        #test zero__plus__zero
-//            s21_decimal val_1 = {{0, 0, 0, 0}};
-//            s21_decimal val_2 = {{0, 0, 0, 0}};
-//            s21_decimal res = {0,};
-//            ck_assert_int_eq(s21_add(val_1, val_2, &res), 0);
-//            ck_assert_int_eq(res.bits[0], 0);
-//            ck_assert_int_eq(res.bits[1], 0);
-//            ck_assert_int_eq(res.bits[2], 0);
-//            ck_assert_int_eq(res.bits[3], 0);
-//        #test pos_max__plus__pos_zero
-//            int int_max = 4294967295;
-//            s21_decimal val_1 = {{int_max, 0, 0, 0}};
-//            s21_decimal val_2 = {{0, 0, 0, 0}};
-//            s21_decimal res = {0,};
-//            ck_assert_int_eq(s21_add(val_1, val_2, &res), 0);
-//            ck_assert_int_eq(res.bits[0], int_max);
-//            ck_assert_int_eq(res.bits[1], 0);
-//            ck_assert_int_eq(res.bits[2], 0);
-//            ck_assert_int_eq(res.bits[3], 0);
-//        #test zero__plus__pos_max
-//            int int_max = 4294967295;
-//            s21_decimal val_1 = {{0, 0, 0, 0}};
-//            s21_decimal val_2 = {{int_max, 0, 0, 0}};
-//            s21_decimal res = {0,};
-//            ck_assert_int_eq(s21_add(val_1, val_2, &res), 0);
-//            ck_assert_int_eq(res.bits[0], int_max);
-//            ck_assert_int_eq(res.bits[1], 0);
-//            ck_assert_int_eq(res.bits[2], 0);
-//            ck_assert_int_eq(res.bits[3], 0);
-//
+    #tcase s21_add_func__error
+        #test error_pos_inf_1
+            // 79228162514264337593543950335 + 0.1 = -
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b1,
+                0b0,
+                0b0,
+                0x00000000
+            }};
+            s21_decimal val_2 = {{
+                0b1001,
+                0b0,
+                0b0,
+                0x00010000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_add(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 1);
+            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
+            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
+
+
+#suite arithmetic_sub   
+    #tcase s21_sub_func__zero
+        #test zero__minus__zero
+            s21_decimal val_1 = {{0, 0, 0, 0}};
+            s21_decimal val_2 = {{0, 0, 0, 0}};
+            s21_decimal res = {0,};
+            ck_assert_int_eq(s21_add(val_1, val_2, &res), 0);
+            ck_assert_int_eq(res.bits[0], 0);
+            ck_assert_int_eq(res.bits[1], 0);
+            ck_assert_int_eq(res.bits[2], 0);
+            ck_assert_int_eq(res.bits[3], 0);
+        #test pos_max__minus__zero
+            // 4294967295 - 0 = 4294967295
+            s21_decimal val_1 = {{
+                0b11111111111111111111111111111111,
+                0b0, 
+                0b0,
+                0x00000000
+            }};
+            s21_decimal val_2 = {{
+                0b0,
+                0b0,
+                0b0,
+                0x00000000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_sub(val_1, val_2, &res);
+            ck_assert_int_eq(status, 0);
+            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+            ck_assert_int_eq(res.bits[1], 0);
+            ck_assert_int_eq(res.bits[2], 0);
+            ck_assert_int_eq(res.bits[3], 0);
+        #test zero__minus__pos_max
+            // 0 - 4294967295 = -4294967295
+            s21_decimal val_1 = {{
+                0b0,
+                0b0,
+                0b0, 
+                0x00000000
+            }};
+            s21_decimal val_2 = {{
+                0b11111111111111111111111111111111,
+                0b0,
+                0b0,
+                0x00000000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_add(val_1, val_2, &res);
+            ck_assert_int_eq(status, 0);
+            print_decimal_in_dec(val_2);
+            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+            ck_assert_int_eq(res.bits[1], 0b0);
+            ck_assert_int_eq(res.bits[2], 0b0);
+            ck_assert_int_eq(res.bits[3], (int)0x80000000);
+
 //    #tcase s21_add_func__one_int
 //        #test pos_norm__plus__neg_norm_res_zero
 //            int a = 42949;

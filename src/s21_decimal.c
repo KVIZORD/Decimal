@@ -43,23 +43,16 @@ int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
       s21_double_decimal res = {
           0,
       };
-      // print_decimal_in_dec(value_1);
-      // print_decimal_in_dec(value_2);
       set_sign_decimal(result, sign_1);
       set_sign_double_decimal(&res, sign_1);
       set_exp_double_decimal(&res, exp);
       sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
-      // print_double_decimal_in_dec(res);
       status = double_decimal_to_decimal(res, result);
     } else if (sign_1) {
-      // printf("sign_1\n");
       set_sign_decimal(&value_1, false);
       status = s21_sub(value_2, value_1, result);
     } else if (sign_2) {
-      // printf("sign_2\n");
       set_sign_decimal(&value_2, false);
-      // print_decimal_in_dec(value_1);
-      // print_decimal_in_dec(value_2);
       status = s21_sub(value_1, value_2, result);
     }
   }
@@ -165,13 +158,14 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
 int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   CompareStatus status = TRUE;
   normalization_decimal(&value_1, &value_2);
-  //   print_decimal_in_dec(value_1);
-  //   print_decimal_in_dec(value_2);
   int sign_1 = get_sign_decimal(value_1);
   int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
+  if (sign_1 && sign_2) {
+    status = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+  } else if (!sign_1 && !sign_2) {
     status = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
-    // status = sign_1 ? !res : res;
+  } else if (is_zero_decimal(value_1) && is_zero_decimal(value_2)) {
+    status = FALSE;
   } else {
     status = sign_1 ? TRUE : FALSE;
   }
@@ -180,49 +174,18 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
 
 // <=
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
   normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_2.bits, value_1.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? !res : res;
-    status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-  } else {
-    status = FALSE;
-  }
-  return status;
+  return s21_is_less(value_1, value_2) || s21_is_equal(value_1, value_2);
 }
 
 // >
 int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
-  normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? res : !res;
-  } else {
-    status = sign_1 ? FALSE : TRUE;
-  }
-  return status;
+  return !s21_is_less_or_equal(value_1, value_2);
 }
 
 // >=
 int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2) {
-  CompareStatus status = TRUE;
-  normalization_decimal(&value_1, &value_2);
-  int sign_1 = get_sign_decimal(value_1);
-  int sign_2 = get_sign_decimal(value_2);
-  if (sign_1 == sign_2) {
-    int res = is_greater_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-    status = sign_1 ? res : !res;
-    status |= is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
-  } else {
-    status = FALSE;
-  }
-  return status;
+  return !s21_is_less(value_1, value_2);
 }
 
 // ==
@@ -233,6 +196,8 @@ int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
   int sign_2 = get_sign_decimal(value_2);
   if (sign_1 == sign_2) {
     status = is_equal_ints(value_1.bits, value_2.bits, INTS_IN_DECIMAL);
+  } else if (is_zero_decimal(value_1) && is_zero_decimal(value_2)) {
+    status = TRUE;
   }
   return status;
 }
@@ -243,6 +208,7 @@ int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
 }
 
 int s21_from_int_to_decimal(int src, s21_decimal *dst) {
+  clear_full_decimal(dst);
   int status = STATUS_OK;
   if (dst) {
     if (src < 0) {
@@ -250,8 +216,6 @@ int s21_from_int_to_decimal(int src, s21_decimal *dst) {
       src *= -1;
     }
     dst->bits[0] = src;
-    dst->bits[1] = 0;
-    dst->bits[2] = 0;
   } else {
     status = STATUS_ERR;
   }
@@ -266,7 +230,6 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   int sign = get_sign_float(src);
   src = fabs(src);
   clear_full_decimal(dst);
-  printf("%e\n", src);
   if (src > 0 && src < pow(10, -EXP_MAX)) {
     status = STATUS_ERR;
   } else if (src != 0) {
@@ -285,29 +248,6 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     set_sign_decimal(dst, sign);
   } else {
     status = STATUS_ERR;
-  }
-
-  return status;
-}
-
-int s21_from_decimal_to_int(s21_decimal src, int *dst) {
-  s21_decimal res = src;
-  s21_decimal ten = {{10, 0, 0, 0}};
-  int status = STATUS_OK;
-  int exp = get_exp_decimal(src);
-  while (exp != 0) {
-    div_decimal_with_remainder(res, ten, &res,
-                               &(s21_decimal){
-                                   0,
-                               });
-    exp -= 1;
-  }
-  int num = res.bits[0];
-  if (res.bits[1] != 0 || res.bits[2] != 0 || !dst) {
-    status = STATUS_ERR;
-  }
-  if (!status) {
-    *dst = get_sign_decimal(res) ? num * -1 : num;
   }
   return status;
 }
@@ -333,6 +273,28 @@ int s21_from_decimal_to_float(s21_decimal src, float *dst) {
   return 0;
 }
 
+int s21_from_decimal_to_int(s21_decimal src, int *dst) {
+  s21_decimal res = src;
+  s21_decimal ten = {{10, 0, 0, 0}};
+  int status = STATUS_OK;
+  int exp = get_exp_decimal(src);
+  while (exp != 0) {
+    div_decimal_with_remainder(res, ten, &res,
+                               &(s21_decimal){
+                                   0,
+                               });
+    exp -= 1;
+  }
+  int num = res.bits[0];
+  if (src.bits[1] != 0 || src.bits[2] != 0 || !dst) {
+    status = STATUS_ERR;
+  }
+  if (!status) {
+    *dst = get_sign_decimal(res) ? num * -1 : num;
+  }
+  return status;
+}
+
 // ближайшее целое число в сторону отрицательной бесконечности
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int exp = get_exp_decimal(value);
@@ -347,7 +309,7 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
     div_decimal_with_remainder(value, then, &value, &remainder);
   }
   set_exp_decimal(&value, exp);
-  if (get_sign_decimal(value)) {
+  if (get_sign_decimal(value) && !is_zero_decimal(remainder)) {
     s21_decimal one = {{1, 0, 0, 0}};
     set_sign_decimal(&one, true);
     s21_add(value, one, &value);
