@@ -23,19 +23,25 @@ void sub_ints(int* value_1, int* value_2, int* result, int count_int);
 int mul_ints(int* value_1, int* value_2, int* result, int count_int);
 int is_greater_ints(int* value_1, int* value_2, int count_int);
 int is_equal_ints(int* value_1, int* value_2, int count_int);
+int add_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result);
+int sub_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result);
 int div_decimal_with_remainder(s21_decimal dividend, s21_decimal divisor, s21_decimal *quotient, s21_decimal *remainder);
 int div_double_decimal_with_remainder(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *quotient, s21_double_decimal *remainder);
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor, s21_double_decimal *result);
+void mul_double_decimal(s21_double_decimal value_1, s21_double_decimal value_2, s21_double_decimal* result);
 void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new);
 
 // converting.c
 void convert_decimal_to_twos_complement(s21_decimal *value);
 void convert_decimal_to_ones_complement(s21_decimal* value);
+void convert_double_decimal_to_twos_complement(s21_double_decimal* value);
+void convert_double_decimal_to_ones_complement(s21_double_decimal* value);
 void convert_ints_to_twos_complement(int* value, int count_int);
 void convert_ints_to_ones_complement(int* value, int count_int);
 int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst);
 void decimal_to_double_decimal(s21_decimal src, s21_double_decimal* dst);
 int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2);
+int normalization_double_decimal(s21_double_decimal* value_1, s21_double_decimal* value_2);
 void change_exp(s21_decimal* value, int exp);
 int bank_round_decimal(s21_decimal* value, int remainder);
 

@@ -5,103 +5,76 @@
 
 #include "common/common.h"
 
-// int main() {
-//   s21_decimal a = {{0, 0, 0, 1 << 16}};
-//   s21_decimal b = {{0, 0, 0, 1 << 16}};
-//   s21_decimal c = {{0, 0, 0, 0}};
+int main() {
+  s21_decimal a = {{0, 0, 0, 0 << 16}};
+  s21_decimal b = {{0, 0, 0, 1 << 16}};
+  s21_decimal c = {{0, 0, 0, 0}};
+  // set_sign_decimal(&a, 1);
+  // set_sign_decimal(&b, 1);
+  a.bits[0] = 0xffffffff;
+  a.bits[1] = 0xffffffff;
+  a.bits[2] = 0xffffffff;
+  // set_sign_decimal(&a, 1);
+  b.bits[0] = 6;
+  // b.bits[0] = 0xffffffff;
+  // b.bits[1] = 0xffffffff;
+  // b.bits[2] = 0xffffffff;
 
-//   a.bits[0] = 0xffffffff;
-//   a.bits[1] = 0xffffffff;
-//   a.bits[2] = 0xffffffff;
-//   // set_sign_decimal(&a, 1);
-//   b.bits[0] = 11;
-//   // b.bits[0] = 0xffffffff;
-//   // b.bits[1] = 0xffffffff;
-//   // b.bits[2] = 0xffffffff;
+  // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
+  // s21_decimal val_2 = {{int_2, 0, 0, 0}};
+  // int r = s21_add(val_1, val_2, &res);
 
-//   // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
-//   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
-//   // int r = s21_add(val_1, val_2, &res);
+  printf("result = %d\n", s21_add(a, b, &c));
+  // printf("result = %d\n", s21_is_less(a, b));
 
-//   printf("result = %d\n", s21_add(b, a, &c));
-//   // printf("result = %d\n", s21_is_less(a, b));
-
-//   print_decimal_in_dec(a);
-//   print_decimal_in_dec(b);
-//   print_decimal_in_dec(c);
-
-//   return 0;
-// }
+  print_decimal_in_dec(a);
+  print_decimal_in_dec(b);
+  print_decimal_in_dec(c);
+  return 0;
+}
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   ArithmeticStatus status = OK;
-  if (!normalization_decimal(&value_1, &value_2)) {
-    int sign_1 = get_sign_decimal(value_1);
-    int sign_2 = get_sign_decimal(value_2);
-    int exp = get_exp_decimal(value_1);
-    if (sign_1 == sign_2) {
-      s21_double_decimal res = {
-          0,
-      };
-      set_sign_decimal(result, sign_1);
-      set_sign_double_decimal(&res, sign_1);
-      set_exp_double_decimal(&res, exp);
-      sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
-      status = double_decimal_to_decimal(res, result);
-    } else if (sign_1) {
-      set_sign_decimal(&value_1, false);
-      status = s21_sub(value_2, value_1, result);
-    } else if (sign_2) {
-      set_sign_decimal(&value_2, false);
-      status = s21_sub(value_1, value_2, result);
-    }
+  int sign_1 = get_sign_decimal(value_1);
+  int sign_2 = get_sign_decimal(value_2);
+  if (sign_1 == sign_2) {
+    status = add_decimal(value_1, value_2, result);
+  } else if (sign_1) {
+    set_sign_decimal(&value_1, false);
+    status = s21_sub(value_2, value_1, result);
+  } else if (sign_2) {
+    set_sign_decimal(&value_2, false);
+    status = s21_sub(value_1, value_2, result);
   }
   return status;
 }
 
 int s21_sub(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-  // printf("================================\n");
   ArithmeticStatus status = OK;
-  if (!normalization_decimal(&value_1, &value_2)) {
-    int sign_1 = get_sign_decimal(value_1);
-    int sign_2 = get_sign_decimal(value_2);
-    int exp = get_exp_decimal(value_1);
-    if (is_zero_decimal(value_1)) {
-      // printf("1\n");
-      s21_negate(value_2, result);
-    } else if (is_zero_decimal(value_2)) {
-      // printf("2\n");
-      copy_decimal(value_1, result);
-    } else if (sign_1 && sign_2 && s21_is_greater(value_1, value_2)) {
-      // printf("3\n");
+  int sign_1 = get_sign_decimal(value_1);
+  int sign_2 = get_sign_decimal(value_2);
+  if (is_zero_decimal(value_1)) {  // если уменьшаемое равно нулю
+    s21_negate(value_2, result);
+  } else if (is_zero_decimal(value_2)) {  // если вычитаемое равно нулю
+    copy_decimal(value_1, result);
+  } else if (sign_1 == sign_2) {  // если знаки чисел одинаковы
+    if (sign_1 && s21_is_greater(value_1, value_2)) {
       status = s21_sub(value_2, value_1, result);
       set_sign_decimal(result, !sign_1);
-    } else if (!sign_1 && !sign_2 && s21_is_less(value_1, value_2)) {
-      // printf("4\n");
+    } else if (!sign_1 && s21_is_less(value_1, value_2)) {
       status = s21_sub(value_2, value_1, result);
       set_sign_decimal(result, !sign_1);
-    } else if (sign_1 == sign_2) {
-      // printf("5\n");
-      s21_double_decimal res = {
-          0,
-      };
-      set_sign_decimal(result, sign_1);
-      set_sign_double_decimal(&res, sign_1);
-      set_exp_double_decimal(&res, exp);
-      convert_decimal_to_twos_complement(&value_2);
-      sum_ints(value_1.bits, value_2.bits, res.bits, INTS_IN_DECIMAL);
-      res.bits[INTS_IN_DECIMAL] = 0;
-      // print_double_decimal_in_dec(res);
-      status = double_decimal_to_decimal(res, result);
-    } else if (sign_1) {
-      // printf("6\n");
-      set_sign_decimal(&value_2, true);
-      status = s21_add(value_1, value_2, result);
-    } else if (sign_2) {
-      // printf("7\n");
-      set_sign_decimal(&value_2, false);
-      status = s21_add(value_1, value_2, result);
+    } else {
+      status = sub_decimal(value_1, value_2, result);
     }
+  } else if (sign_1) {  // если первое число отрицательное, второе -
+                        // положительные
+    set_sign_decimal(&value_2, true);
+    status = s21_add(value_1, value_2, result);
+  } else if (sign_2) {  // если первое число положительные, второе -
+                        // отрицательное
+    set_sign_decimal(&value_2, false);
+    status = s21_add(value_1, value_2, result);
   }
   return status;
 }

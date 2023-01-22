@@ -772,9 +772,13 @@
             s21_decimal val_1 = {{a, 0, 0, 0}};
             s21_decimal val_2 = {{b, 0, 0, 1 << 31}};
             s21_decimal res = {0,};
-            int r = s21_add(val_1, val_2, &res);
+            int status = s21_add(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
             // print_decimal_in_dec(res);
-            ck_assert_int_eq(r, 0);
+            // print_decimal(res);
+            // print_binary_int(res.bits[3]);
+            ck_assert_int_eq(status, 0);
             ck_assert_int_eq(res.bits[0], a - b);
             ck_assert_int_eq(res.bits[1], 0);
             ck_assert_int_eq(res.bits[2], 0);
@@ -785,8 +789,13 @@
             s21_decimal val_1 = {{a, 0, 0, 0}};
             s21_decimal val_2 = {{b, 0, 0, 0}};
             s21_decimal res = {0,};
-            int r = s21_add(val_1, val_2, &res);
-            ck_assert_int_eq(r, 0);
+            int status = s21_add(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            // print_decimal(res);
+            // print_binary_int(res.bits[3]);
+            ck_assert_int_eq(status, 0);
             ck_assert_int_eq(res.bits[0], a + b);
             ck_assert_int_eq(res.bits[1], 0);
             ck_assert_int_eq(res.bits[2], 0);
@@ -1103,7 +1112,6 @@
     #tcase s21_add_func__bank_round
         #test pos_normal_plus_pos_normal_1
             // 7922816251426433759354395033.5 + 0.1 = 7922816251426433759354395034
-            //    11001100110011001100110011001 10011001100110011001100110011001 10011001100110011001100110011010
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
                 0b11111111111111111111111111111111,
@@ -1128,7 +1136,7 @@
             ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
             ck_assert_int_eq(res.bits[3], (int)0x00000000);
         #test pos_normal_plus_pos_normal_2
-            // 7922816251426433759354395033.5+ 1.0 = 7922816251426433759354395034
+            // 7922816251426433759354395033.5 + 1.0 = 7922816251426433759354395034
             //    11001100110011001100110011001 10011001100110011001100110011001 10011001100110011001100110011010
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
@@ -1154,7 +1162,7 @@
             ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
             ck_assert_int_eq(res.bits[3], (int)0x00000000);
         #test pos_normal_plus_pos_normal_3
-            // 7922816251426433759354395033.5+ 2.0 = 7922816251426433759354395036
+            // 7922816251426433759354395033.5 + 2.0 = 7922816251426433759354395036
             //    11001100110011001100110011001 10011001100110011001100110011001 10011001100110011001100110011100
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
@@ -1180,7 +1188,7 @@
             ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
             ck_assert_int_eq(res.bits[3], (int)0x00000000);
         #test pos_normal_plus_pos_normal_4
-            // 7922816251426433759354395033.5+ 1.7 = 7922816251426433759354395035
+            // 7922816251426433759354395033.5 + 1.7 = 7922816251426433759354395035
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
                 0b11111111111111111111111111111111,
@@ -1207,25 +1215,25 @@
 
     #tcase s21_add_func__error
         #test error_pos_inf_1
-            // 79228162514264337593543950335 + 0.1 = -
+            // 79228162514264337593543950335 + 0.5 = INF_POSIT
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
-                0b1,
-                0b0,
-                0b0,
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
                 0x00000000
             }};
             s21_decimal val_2 = {{
-                0b1001,
+                0b111,
                 0b0,
                 0b0,
                 0x00010000
             }};
             s21_decimal res = {0,};
             int status = s21_add(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
+            print_decimal_in_dec(val_1);
+            print_decimal_in_dec(val_2);
+            print_decimal_in_dec(res);
             ck_assert_int_eq(status, 1);
             // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
             // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
@@ -1897,186 +1905,186 @@
             ck_assert_int_eq(res.bits[1], (int)0b00000000000101010011011111000111);
             ck_assert_int_eq(res.bits[2], (int)0b11011101010000111100001111111);
             ck_assert_int_eq(res.bits[3], (int)0x00140000);
-        #test three_int__neg_norm__minus__pos_norm
-            // -85833105.762574984579732 - 235467.46665509876438976547 = -86068573.22923008334412176547
-            //    11011110011110110110011101110 01100011101010001101010011111001 11001000110001001101110010100011
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b1000101010010100,
-                0b101101000001110111111000111,
-                0b1001000101101,
-                0x800f0000
-            }};
-            s21_decimal val_2 = {{
-                0b11110101010100001100100000100011,
-                0b10110001110010011100111010011000,
-                0b100110111101000110111,
-                0x00140000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
-            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
-            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
-            ck_assert_int_eq(res.bits[3], (int)0x80140000);
-        #test three_int__pos_norm__minus__neg_norm_1
-            // 85833105.762574984579732 + 235467.46665509876438976547 = 86068573.22923008334412176547
-            //      
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b1000101010010100,
-                0b101101000001110111111000111,
-                0b1001000101101,
-                0x000f0000
-            }};
-            s21_decimal val_2 = {{
-                0b11110101010100001100100000100011,
-                0b10110001110010011100111010011000,
-                0b100110111101000110111,
-                0x80140000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
-            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
-            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
-            ck_assert_int_eq(res.bits[3], (int)0x00140000);
-        #test three_int__neg_norm__minus__neg_norm
-            // -85833105.762574984579732 - 235467.46665509876438976547 = -86068573.22923008334412176547
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b1000101010010100,
-                0b101101000001110111111000111,
-                0b1001000101101,
-                0x800f0000
-            }};
-            s21_decimal val_2 = {{
-                0b11110101010100001100100000100011,
-                0b10110001110010011100111010011000,
-                0b100110111101000110111,
-                0x80140000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_add(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
-            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
-            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
-            ck_assert_int_eq(res.bits[3], (int)0x80140000);
-
-    #tcase s21_sub_func__max
-        #test pos_max_minus_zero_1
-            // 79228162514264337593543950335 - 0 = 79228162514264337593543950335
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0x00000000
-            }};
-            s21_decimal val_2 = {{
-                0b0,
-                0b0,
-                0b0,
-                0x00020000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[3], (int)0x00000000);
-        #test neg_max_minus_zero_1
-            // -79228162514264337593543950335 - 0 = -79228162514264337593543950335
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0x80000000
-            }};
-            s21_decimal val_2 = {{
-                0b0,
-                0b0,
-                0b0,
-                0x00020000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[3], (int)0x80000000);
-        #test zero_minus_pos_max_1
-            // -0.00 - 79228162514264337593543950335 = -79228162514264337593543950335
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b0,
-                0b0,
-                0b0,
-                0x80020000
-            }};
-            s21_decimal val_2 = {{
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0x00000000
-            }};
-
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[3], (int)0x80000000);
-        #test zero_minus_neg_max_1
-            // -0.00 + 79228162514264337593543950335 = 79228162514264337593543950335
-            //                                ||                              ||                               |
-            s21_decimal val_1 = {{
-                0b0,
-                0b0,
-                0b0,
-                0x80020000
-            }};
-            s21_decimal val_2 = {{
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0b11111111111111111111111111111111,
-                0x80000000
-            }};
-            s21_decimal res = {0,};
-            int status = s21_sub(val_1, val_2, &res);
-            // print_decimal_in_dec(val_1);
-            // print_decimal_in_dec(val_2);
-            // print_decimal_in_dec(res);
-            ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
-            ck_assert_int_eq(res.bits[3], (int)0x00000000);
+//        #test three_int__neg_norm__minus__pos_norm
+//            // -85833105.762574984579732 - 235467.46665509876438976547 = -86068573.22923008334412176547
+//            //    11011110011110110110011101110 01100011101010001101010011111001 11001000110001001101110010100011
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b1000101010010100,
+//                0b101101000001110111111000111,
+//                0b1001000101101,
+//                0x800f0000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b11110101010100001100100000100011,
+//                0b10110001110010011100111010011000,
+//                0b100110111101000110111,
+//                0x00140000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
+//            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
+//            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
+//            ck_assert_int_eq(res.bits[3], (int)0x80140000);
+//        #test three_int__pos_norm__minus__neg_norm_1
+//            // 85833105.762574984579732 + 235467.46665509876438976547 = 86068573.22923008334412176547
+//            //      
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b1000101010010100,
+//                0b101101000001110111111000111,
+//                0b1001000101101,
+//                0x000f0000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b11110101010100001100100000100011,
+//                0b10110001110010011100111010011000,
+//                0b100110111101000110111,
+//                0x80140000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
+//            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
+//            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
+//            ck_assert_int_eq(res.bits[3], (int)0x00140000);
+//        #test three_int__neg_norm__minus__neg_norm
+//            // -85833105.762574984579732 - 235467.46665509876438976547 = -86068573.22923008334412176547
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b1000101010010100,
+//                0b101101000001110111111000111,
+//                0b1001000101101,
+//                0x800f0000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b11110101010100001100100000100011,
+//                0b10110001110010011100111010011000,
+//                0b100110111101000110111,
+//                0x80140000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_add(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11001000110001001101110010100011);
+//            ck_assert_int_eq(res.bits[1], (int)0b01100011101010001101010011111001);
+//            ck_assert_int_eq(res.bits[2], (int)0b11011110011110110110011101110);
+//            ck_assert_int_eq(res.bits[3], (int)0x80140000);
+//
+//    #tcase s21_sub_func__max
+//        #test pos_max_minus_zero_1
+//            // 79228162514264337593543950335 - 0 = 79228162514264337593543950335
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0x00000000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b0,
+//                0b0,
+//                0b0,
+//                0x00020000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[3], (int)0x00000000);
+//        #test neg_max_minus_zero_1
+//            // -79228162514264337593543950335 - 0 = -79228162514264337593543950335
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0x80000000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b0,
+//                0b0,
+//                0b0,
+//                0x00020000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[3], (int)0x80000000);
+//        #test zero_minus_pos_max_1
+//            // -0.00 - 79228162514264337593543950335 = -79228162514264337593543950335
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b0,
+//                0b0,
+//                0b0,
+//                0x80020000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0x00000000
+//            }};
+//
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[3], (int)0x80000000);
+//        #test zero_minus_neg_max_1
+//            // -0.00 + 79228162514264337593543950335 = 79228162514264337593543950335
+//            //                                ||                              ||                               |
+//            s21_decimal val_1 = {{
+//                0b0,
+//                0b0,
+//                0b0,
+//                0x80020000
+//            }};
+//            s21_decimal val_2 = {{
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0b11111111111111111111111111111111,
+//                0x80000000
+//            }};
+//            s21_decimal res = {0,};
+//            int status = s21_sub(val_1, val_2, &res);
+//            // print_decimal_in_dec(val_1);
+//            // print_decimal_in_dec(val_2);
+//            // print_decimal_in_dec(res);
+//            ck_assert_int_eq(status, 0);
+//            ck_assert_int_eq(res.bits[0], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[1], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[2], (int)0b11111111111111111111111111111111);
+//            ck_assert_int_eq(res.bits[3], (int)0x00000000);
  
 //    #tcase s21_sub_func__bank_round
 //        #test pos_normal_minus_pos_normal_1

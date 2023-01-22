@@ -1,5 +1,6 @@
 #include "common.h"
 
+
 void convert_decimal_to_twos_complement(s21_decimal* value) {
   convert_decimal_to_ones_complement(value);
   s21_decimal one = {{1, 0, 0, 0}};
@@ -12,6 +13,14 @@ void convert_decimal_to_ones_complement(s21_decimal* value) {
   for (int i = 0; i < INTS_IN_DECIMAL; i++) {
     value->bits[i] = ~(value->bits[i]);
   }
+}
+
+void convert_double_decimal_to_twos_complement(s21_double_decimal* value) {
+  convert_ints_to_twos_complement(value->bits, 2 * INTS_IN_DECIMAL);
+}
+
+void convert_double_decimal_to_ones_complement(s21_double_decimal* value) {
+  convert_ints_to_ones_complement(value->bits, 2 * INTS_IN_DECIMAL);
 }
 
 void convert_ints_to_twos_complement(int* value, int count_int) {
@@ -29,28 +38,22 @@ void convert_ints_to_ones_complement(int* value, int count_int) {
 }
 
 int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
+  print_double_decimal_in_dec(src);
   int exp = get_exp_double_decimal(src);
   ArithmeticStatus status = OK;
-  s21_double_decimal then = {
-      0,
-  };
-  s21_double_decimal prev = {
-      0,
-  };
-  then.bits[0] = 10;
-  while (exp < 2 * EXP_MAX &&
-         get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) >
-             INTS_IN_DECIMAL * BITS_IN_INT) {
+  s21_double_decimal ten = {{10, 0,}};
+  s21_double_decimal prev = {0,};
+  while (exp < 2 * EXP_MAX && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
     copy_double_decimal(src, &prev);
-    div_double_decimal(src, then, &src);
+    div_double_decimal(src, ten, &src);
     exp -= 1;
   }
+  print_double_decimal_in_dec(src);
   if (exp > EXP_MAX) {
     status = INF_NEGAT;
   } else if (exp < EXP_MIN) {
     status = INF_POSIT;
-  } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) >
-             INTS_IN_DECIMAL * BITS_IN_INT) {
+  } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
     status = INF_POSIT;
   } else {
     set_exp_double_decimal(&src, exp);
@@ -58,15 +61,10 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
       dst->bits[i] = src.bits[i];
     }
     dst->bits[INTS_IN_DECIMAL] = src.bits[2 * INTS_IN_DECIMAL];
-    s21_double_decimal remainder = {
-        0,
-    };
-    div_double_decimal_with_remainder(
-        prev, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 0}},
-        &(s21_double_decimal){
-            0,
-        },
-        &remainder);
+    s21_double_decimal remainder = {0,};
+    div_double_decimal_with_remainder(prev, (s21_double_decimal){{10, 0,}}, &(s21_double_decimal){0,}, &remainder);
+    // print_decimal_in_dec(*dst);
+    // printf("remainder = %d\n", remainder.bits[0]);
     bank_round_decimal(dst, remainder.bits[0]);
   }
 
@@ -104,6 +102,22 @@ int normalization_decimal(s21_decimal* value_1, s21_decimal* value_2) {
     return status;
 }
 
+int normalization_double_decimal(s21_double_decimal* value_1, s21_double_decimal* value_2) {
+    Status status = STATUS_OK;
+    int exp_1 = get_exp_double_decimal(*value_1);
+    int exp_2 = get_exp_double_decimal(*value_2);
+    for (; exp_1 > exp_2; exp_2++) {
+      mul_double_decimal(*value_2, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 1 << BIT_EXP_START}}, value_2);
+    }
+    for (; exp_1 < exp_2; exp_1++) {
+      mul_double_decimal(*value_1, (s21_double_decimal){{10, 0, 0, 0, 0, 0, 1 << BIT_EXP_START}}, value_1);
+    }
+    if (get_exp_double_decimal(*value_1) != get_exp_double_decimal(*value_2)) {
+        status = STATUS_ERR;
+    }
+    return status;
+}
+
 void change_exp(s21_decimal* value, int exp) {
     s21_decimal tmp = {{0, 0, 0, 0}};
     int exp_old = get_exp_decimal(*value);
@@ -124,24 +138,27 @@ void change_exp(s21_decimal* value, int exp) {
 }
 
 int bank_round_decimal(s21_decimal* dst, int remainder) {
-    ArithmeticStatus status = OK;
-    s21_double_decimal res = {0,};
-    s21_decimal one = {{1, 0, 0, 0}};
-    if (remainder == 5) {
-        s21_decimal then = {{10, 0, 0, 0}};
-        s21_decimal last_number = {0,};
-        s21_mod(*dst, then, &last_number);
-        if (last_number.bits[0] % 2) {
-            sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
-            status = double_decimal_to_decimal(res, dst);
-        }
-    } else if (remainder > 5) {
-        sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
-        status = double_decimal_to_decimal(res, dst);
-
-    } else if (remainder > 5) {
-        sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
-        status = double_decimal_to_decimal(res, dst);
-    }
-    return status;
+  ArithmeticStatus status = OK;
+  s21_double_decimal res = {0,};
+  s21_decimal one = {{1, 0,}};
+  if (remainder == 5) {
+      s21_decimal then = {{10, 0,}};
+      s21_decimal last_number = {0,};
+      s21_mod(*dst, then, &last_number);
+      if (last_number.bits[0] % 2) {
+          sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
+          res.bits[2 * INTS_IN_DECIMAL] = dst->bits[INTS_IN_DECIMAL];
+          status = double_decimal_to_decimal(res, dst);
+      }
+  } else if (remainder > 5) {
+    print_decimal_in_dec(*dst);
+    print_decimal_in_dec(one);
+    status = s21_add(*dst, one, dst);
+    // print_decimal_in_dec(*dst);
+    // sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
+    // res.bits[2 * INTS_IN_DECIMAL] = dst->bits[INTS_IN_DECIMAL];
+    // print_double_decimal_in_dec(res);
+    // status = double_decimal_to_decimal(res, dst);
+  } 
+  return status;
 }

@@ -108,6 +108,40 @@ int div_double_decimal_with_remainder(s21_double_decimal dividend,
   return status;
 }
 
+void mul_double_decimal(s21_double_decimal value_1, s21_double_decimal value_2, s21_double_decimal* result) {
+  clear_double_decimal(result);
+  mul_ints(value_1.bits, value_2.bits, result->bits, 2 * INTS_IN_DECIMAL);
+  set_sign_double_decimal(result, get_sign_double_decimal(value_1) ^ get_sign_double_decimal(value_2));
+  set_exp_double_decimal(result, get_exp_double_decimal(value_1) + get_exp_double_decimal(value_2));
+}
+
+int add_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
+  s21_double_decimal double_v1 = {0,};
+  s21_double_decimal double_v2 = {0,};
+  s21_double_decimal double_r = {0,};
+  decimal_to_double_decimal(value_1, &double_v1);
+  decimal_to_double_decimal(value_2, &double_v2);
+  normalization_double_decimal(&double_v1, &double_v2);
+  sum_ints(double_v1.bits, double_v2.bits, double_r.bits, 2 * INTS_IN_DECIMAL);
+  double_r.bits[2 * INTS_IN_DECIMAL] = double_v1.bits[2 * INTS_IN_DECIMAL];
+  // print_double_decimal_in_dec(double_r);
+  return double_decimal_to_decimal(double_r, result);
+}
+
+int sub_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
+  s21_double_decimal double_v1 = {0,};
+  s21_double_decimal double_v2 = {0,};
+  s21_double_decimal double_r = {0,};
+  decimal_to_double_decimal(value_1, &double_v1);
+  decimal_to_double_decimal(value_2, &double_v2);
+  normalization_double_decimal(&double_v1, &double_v2);
+  convert_double_decimal_to_twos_complement(&double_v2);
+  sum_ints(double_v1.bits, double_v2.bits, double_r.bits, 2 * INTS_IN_DECIMAL);
+  double_r.bits[2 * INTS_IN_DECIMAL] = double_v1.bits[2 * INTS_IN_DECIMAL];
+  // print_double_decimal_in_dec(double_r);
+  return double_decimal_to_decimal(double_r, result);
+}
+
 int is_greater_ints(int* value_1, int* value_2, int count_int) {
   bool less = false;
   for (int i = count_int - 1; i >= 0; i--) {
