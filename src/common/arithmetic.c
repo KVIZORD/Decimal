@@ -175,9 +175,7 @@ void sub_ints(int* value_1, int* value_2, int* result, int count_int) {
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
                        s21_double_decimal* result) {
   int status = 0;
-  s21_double_decimal complement = {
-      0,
-  };
+  s21_double_decimal complement = {0,};
   copy_double_decimal(divisor, &complement);
   convert_ints_to_twos_complement(complement.bits, 2 * INTS_IN_DECIMAL);
   if (!is_zero_double_decimal(divisor)) {

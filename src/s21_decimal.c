@@ -4,34 +4,42 @@
 #include <math.h>
 
 #include "common/common.h"
+//  1101101111100111000000000011010 10110001011000100101101110010101
+//  00100010000000000000000000000000
+//                                ||                              || |
+// int main() {
+//   // s21_decimal a = {{0, 0, 0, 0 << 16}};
+//   // s21_decimal b = {{0, 0, 0, 1 << 16}};
+//   // s21_decimal c = {{0, 0, 0, 0}};
+//   // set_sign_decimal(&a, 1);
+//   // set_sign_decimal(&b, 1);
+//   // a.bits[0] = 0b00100010000000000000000000000000;
+//   // a.bits[1] = 0b10110001011000100101101110010101;
+//   // a.bits[2] = 0b1101101111100111000000000011010;
+//   // set_sign_decimal(&a, 1);
+//   // b.bits[0] = 1;
+//   // b.bits[0] = 0xffffffff;
+//   // b.bits[1] = 0xffffffff;
+//   // b.bits[2] = 0xffffffff;
 
-int main() {
-  s21_decimal a = {{0, 0, 0, 0 << 16}};
-  s21_decimal b = {{0, 0, 0, 1 << 16}};
-  s21_decimal c = {{0, 0, 0, 0}};
-  // set_sign_decimal(&a, 1);
-  // set_sign_decimal(&b, 1);
-  a.bits[0] = 0xffffffff;
-  a.bits[1] = 0xffffffff;
-  a.bits[2] = 0xffffffff;
-  // set_sign_decimal(&a, 1);
-  b.bits[0] = 6;
-  // b.bits[0] = 0xffffffff;
-  // b.bits[1] = 0xffffffff;
-  // b.bits[2] = 0xffffffff;
+//   // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
+//   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
 
-  // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
-  // s21_decimal val_2 = {{int_2, 0, 0, 0}};
-  // int r = s21_add(val_1, val_2, &res);
+//   // printf("result = %d\n", s21_mul(a, b, &c));
+//   // printf("result = %d\n", s21_is_less(a, b));
 
-  printf("result = %d\n", s21_add(a, b, &c));
-  // printf("result = %d\n", s21_is_less(a, b));
-
-  print_decimal_in_dec(a);
-  print_decimal_in_dec(b);
-  print_decimal_in_dec(c);
-  return 0;
-}
+//   s21_decimal res = {
+//       0,
+//   };
+//   printf("result = %d\n", s21_mul(val_1, val_2, &res));
+//   print_decimal_in_dec(val_1);
+//   print_decimal_in_dec(val_2);
+//   print_decimal_in_dec(res);
+//   // print_decimal_in_dec(a);
+//   // print_decimal_in_dec(b);
+//   // print_decimal_in_dec(c);
+//   return 0;
+// }
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   ArithmeticStatus status = OK;
@@ -91,7 +99,7 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   };
   decimal_to_double_decimal(value_1, &v_1);
   decimal_to_double_decimal(value_2, &v_2);
-
+  clear_decimal(result);
   // Умножение
   mul_ints(v_1.bits, v_2.bits, r_2.bits, 2 * INTS_IN_DECIMAL);
   set_sign_double_decimal(
@@ -220,13 +228,18 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
     // приведение float
     float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
                                          &mantissa, &exp);
+    // printf("MANTISSA = %7d\n", mantissa);
+    // printf("EXP = %7d\n", exp);
     copy_ints(&mantissa, dst->bits, 0);
+    // print_decimal_in_dec(*dst);
     // сведение положительной экспоненты к нулю
     while (status == STATUS_OK && exp > EXP_MIN) {
       status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
       exp -= 1;
     }
+    // print_decimal_in_dec(*dst);
   }
+  // если экспонента  MMMMMMM*10^() 1234567*10^28
   if (status == STATUS_OK && -exp >= EXP_MIN && -exp <= EXP_MAX) {
     set_exp_decimal(dst, -exp);
     set_sign_decimal(dst, sign);

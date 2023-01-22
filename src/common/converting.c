@@ -38,36 +38,31 @@ void convert_ints_to_ones_complement(int* value, int count_int) {
 }
 
 int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
-  print_double_decimal_in_dec(src);
+  // print_double_decimal_in_dec(src);
+  int sign = get_sign_double_decimal(src);
   int exp = get_exp_double_decimal(src);
   ArithmeticStatus status = OK;
-  s21_double_decimal ten = {{10, 0,}};
-  s21_double_decimal prev = {0,};
+  s21_double_decimal remainder = {0,};
+  // деление "double_decimal" на 10 пока его мантиса не поместится в "decimal"
   while (exp < 2 * EXP_MAX && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
-    copy_double_decimal(src, &prev);
-    div_double_decimal(src, ten, &src);
+    div_double_decimal_with_remainder(src, (s21_double_decimal){{10, 0,}}, &src, &remainder);
     exp -= 1;
   }
-  print_double_decimal_in_dec(src);
-  if (exp > EXP_MAX) {
-    status = INF_NEGAT;
-  } else if (exp < EXP_MIN) {
-    status = INF_POSIT;
+  // print_double_decimal_in_dec(src);
+  if (exp > EXP_MAX || exp < 0) {
+    status = sign ? INF_NEGAT : INF_POSIT;
   } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
-    status = INF_POSIT;
+    status = sign ? INF_NEGAT : INF_POSIT;
   } else {
     set_exp_double_decimal(&src, exp);
+    // print_double_decimal_in_dec(src);
     for (int i = 0; i < INTS_IN_DECIMAL; i++) {
       dst->bits[i] = src.bits[i];
     }
     dst->bits[INTS_IN_DECIMAL] = src.bits[2 * INTS_IN_DECIMAL];
-    s21_double_decimal remainder = {0,};
-    div_double_decimal_with_remainder(prev, (s21_double_decimal){{10, 0,}}, &(s21_double_decimal){0,}, &remainder);
     // print_decimal_in_dec(*dst);
-    // printf("remainder = %d\n", remainder.bits[0]);
-    bank_round_decimal(dst, remainder.bits[0]);
+    status = bank_round_decimal(dst, remainder.bits[0]);
   }
-
   return status;
 }
 
@@ -138,27 +133,29 @@ void change_exp(s21_decimal* value, int exp) {
 }
 
 int bank_round_decimal(s21_decimal* dst, int remainder) {
+  // print_decimal_in_dec(*dst);
+  // printf("remainder = %d\n", remainder);
   ArithmeticStatus status = OK;
-  s21_double_decimal res = {0,};
-  s21_decimal one = {{1, 0,}};
+  bool is_even_last_number = false;
   if (remainder == 5) {
-      s21_decimal then = {{10, 0,}};
       s21_decimal last_number = {0,};
-      s21_mod(*dst, then, &last_number);
+      s21_mod(*dst, (s21_decimal){{10, 0,}}, &last_number);
       if (last_number.bits[0] % 2) {
-          sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
-          res.bits[2 * INTS_IN_DECIMAL] = dst->bits[INTS_IN_DECIMAL];
-          status = double_decimal_to_decimal(res, dst);
+        is_even_last_number = true;
       }
-  } else if (remainder > 5) {
-    print_decimal_in_dec(*dst);
-    print_decimal_in_dec(one);
-    status = s21_add(*dst, one, dst);
-    // print_decimal_in_dec(*dst);
-    // sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
-    // res.bits[2 * INTS_IN_DECIMAL] = dst->bits[INTS_IN_DECIMAL];
-    // print_double_decimal_in_dec(res);
-    // status = double_decimal_to_decimal(res, dst);
+  }
+  if (remainder > 5 || (remainder == 5 && is_even_last_number)) {  
+    s21_decimal one = {{1, 0,}};
+    s21_decimal res = {0,};
+    int transfer_bit = sum_ints(dst->bits, one.bits, res.bits, INTS_IN_DECIMAL);
+    if (transfer_bit) {
+      // status = INF_POSIT;
+      status = get_sign_decimal(*dst) ? INF_NEGAT : INF_POSIT;
+    } else {
+      for (int i = 0; i < INTS_IN_DECIMAL; i++) {
+        dst->bits[i] = res.bits[i];
+      }
+    }
   } 
   return status;
 }
