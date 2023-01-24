@@ -124,7 +124,6 @@ int add_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
   normalization_double_decimal(&double_v1, &double_v2);
   sum_ints(double_v1.bits, double_v2.bits, double_r.bits, 2 * INTS_IN_DECIMAL);
   double_r.bits[2 * INTS_IN_DECIMAL] = double_v1.bits[2 * INTS_IN_DECIMAL];
-  // print_double_decimal_in_dec(double_r);
   return double_decimal_to_decimal(double_r, result);
 }
 
@@ -138,7 +137,6 @@ int sub_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
   convert_double_decimal_to_twos_complement(&double_v2);
   sum_ints(double_v1.bits, double_v2.bits, double_r.bits, 2 * INTS_IN_DECIMAL);
   double_r.bits[2 * INTS_IN_DECIMAL] = double_v1.bits[2 * INTS_IN_DECIMAL];
-  // print_double_decimal_in_dec(double_r);
   return double_decimal_to_decimal(double_r, result);
 }
 
@@ -167,11 +165,6 @@ int is_equal_ints(int* value_1, int* value_2, int count_int) {
   return equal;
 }
 
-void sub_ints(int* value_1, int* value_2, int* result, int count_int) {
-  convert_ints_to_twos_complement(value_2, count_int);
-  sum_ints(value_1, value_2, result, count_int);
-}
-
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
                        s21_double_decimal* result) {
   int status = 0;
@@ -182,14 +175,12 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
     s21_double_decimal tmp = {
         0,
     };
-    // print_double_decimal(complement);
     for (int num_int = 2 * INTS_IN_DECIMAL - 1; num_int >= 0; num_int--) {
       for (int num_bit = BITS_IN_INT - 1; num_bit >= 0; num_bit--) {
         left_shift_double_decimal(&tmp);
         if (get_bit_double_decimal(dividend, num_int, num_bit)) {
           set_bit_double_decimal(&tmp, 0, 0);
         }
-        // print_double_decimal_in_dec(tmp);
         if (is_greater_ints(tmp.bits, divisor.bits, 2 * INTS_IN_DECIMAL)) {
           sum_ints(tmp.bits, complement.bits, tmp.bits, 2 * INTS_IN_DECIMAL);
           set_bit_double_decimal(result, num_int, num_bit);
@@ -201,11 +192,6 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
         }
       }
     }
-    // while (get_width_number_bits_non_blunk(result->bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
-    //   left_shift_double_decimal(&tmp);
-    // }
-    // print_double_decimal_in_dec(*result);
-    // print_double_decimal(*result);
   } else {
     status = 3;
   }

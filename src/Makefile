@@ -44,7 +44,7 @@ gcov_report:
 	genhtml s21_coverage.info --output-directory s21_lcov_report
 	open ./s21_lcov_report/index.html
 
-test: clean $(MAIN_FILE).a autotest
+test: clean $(MAIN_FILE).a
 	$(CC) $(CFLAGS) -o $(TEST) $(TEST).c $(MAIN_FILE).a $(LIBS)
 	rm -rf *.o
 	./$(TEST)

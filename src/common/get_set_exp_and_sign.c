@@ -62,12 +62,3 @@ int get_sign_float(float number) {
   int num = (int)(number);
   return get_bit_int(num, BITS_IN_INT - 1);
 }
-
-int set_sign_float(float* number, int sign) {
-  int* num = (int*)(number);
-  int status = true;
-  if (sign) {
-    status = reset_bit_int(num, BITS_IN_INT - 1);
-  }
-  return status;
-}
