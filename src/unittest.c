@@ -2950,6 +2950,10 @@ int main(void) {
   SRunner *sr = srunner_create(s1);
   int nf;
 
+  /* User-specified pre-run code */
+#line 2699
+  srunner_set_fork_status(sr, CK_NOFORK);
+
   suite_add_tcase(s1, tc1_1);
   tcase_add_test(tc1_1, is_less_first_less);
   tcase_add_test(tc1_1, is_less_first_not_less);

@@ -2694,3 +2694,7 @@
         s21_from_decimal_to_float(c, &res);
         float res_origin = fmod(num_1, num_2);
         ck_assert_float_eq_tol(res, res_origin, 0.0000001);
+
+#main-pre
+    srunner_set_fork_status(sr, CK_NOFORK);
+
