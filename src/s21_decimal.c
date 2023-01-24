@@ -1,66 +1,6 @@
 #include "s21_decimal.h"
 
-#include <limits.h>
-#include <math.h>
-
 #include "common/common.h"
-
-// int main() {
-//   // s21_decimal a = {{2, 0, 0, 0 << 16}};
-//   // s21_decimal b = {{3, 0, 0, 1 << 16}};
-//   s21_decimal c = {{0, 0, 0, 0}};
-//   // set_sign_decimal(&a, 1);
-//   // set_sign_decimal(&b, 1);
-//   // a.bits[0] = 0b00100010000000000000000000000000;
-//   // a.bits[1] = 0b10110001011000100101101110010101;
-//   // a.bits[2] = 0b1101101111100111000000000011010;
-//   // set_sign_decimal(&a, 1);
-//   // b.bits[0] = 1;
-//   // b.bits[0] = 0xffffffff;
-//   // b.bits[1] = 0xffffffff;
-//   // b.bits[2] = 0xffffffff;
-//   // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
-//   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
-//   //  printf("result = %d\n", s21_div(a, b, &c));
-//   // s21_decimal a = {{0b11111111111111111111111111111111,
-//   //                       0b11111111111111111111111111111111,
-//   //                       0b11111111111111111111111111111111, 0x00000000}};
-//   // s21_decimal b = {{55, 0b0, 0b0, 0x00010000}};
-//   // s21_double_decimal a = {{
-//   //   0b11000000000000000000000000000000,
-//   //   0b00100101000110111101000001101010,
-//   //   0b01111001110000111110000010100011,
-//   //   0b00111111111111111111111111111101,
-//   //   0b11011010111001000010111110010101,
-//   //   0b10000110001111000001111101011100,
-//   //   0b00000000000000000000000000000000
-//   // }};
-//   // s21_double_decimal b = {{
-//   //   0b11000000000000000000000000000000,
-//   //   0b00100101000110111101000001101010,
-//   //   0b01111001110000111110000010100011,
-//   //   0b00111111111111111111111111111101,
-//   //   0b11011010111001000010111110010101,
-//   //   0b10000110001111000001111101011100,
-//   //   0b00000000000000000000000000000000
-//   // }};
-//   // s21_double_decimal c = {0, };
-//   // printf("sum_ints = %d\n", sum_ints(a.bits, b.bits, c.bits, 2 *
-//   INTS_IN_DECIMAL));
-//   // s21_decimal res = {
-//   //     0,
-//   // };
-//   // printf("result = %d\n", s21_div(val_1, val_2, &res));
-//   printf("result = %d\n", s21_div(a, b, &c));
-//   // printf("result = %d\n", s21_is_less(a, b));
-//   // print_decimal_in_dec(val_1);
-//   // print_decimal_in_dec(val_2);
-//   // print_decimal_in_dec(res);
-//    print_decimal_in_dec(a);
-//    print_decimal_in_dec(b);
-//    print_decimal_in_dec(c);
-//   return 0;
-// }
 
 int s21_add(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   ArithmeticStatus status = OK;
@@ -121,14 +61,12 @@ int s21_mul(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   decimal_to_double_decimal(value_1, &v_1);
   decimal_to_double_decimal(value_2, &v_2);
   clear_decimal(result);
-  // Умножение
   mul_ints(v_1.bits, v_2.bits, r_2.bits, 2 * INTS_IN_DECIMAL);
   set_sign_double_decimal(
       &r_2, get_sign_decimal(value_1) ^ get_sign_decimal(value_2));
   set_exp_double_decimal(&r_2,
                          get_exp_decimal(value_1) + get_exp_decimal(value_2));
 
-  // Обратное преобразование в DECIMAL
   return double_decimal_to_decimal(r_2, result);
 }
 
@@ -148,18 +86,12 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     };
     decimal_to_double_decimal(value_1, &v_1);
     decimal_to_double_decimal(value_2, &v_2);
-    // print_double_decimal_in_dec(v_1);
     casting_exp_double_decimal(v_1, &v_1, EXP_MAX * 2 - 1);
-    // print_double_decimal_in_dec(v_1);
-    // print_double_decimal(v_1);
     div_double_decimal(v_1, v_2, &r_2);
     set_sign_double_decimal(
         &r_2, get_sign_decimal(value_1) ^ get_sign_decimal(value_2));
     set_exp_double_decimal(
         &r_2, get_exp_double_decimal(v_1) - get_exp_double_decimal(v_2));
-    // print_double_decimal_in_dec(v_2);
-    // print_double_decimal_in_dec(r_2);
-    // print_double_decimal(r_2);
     status = double_decimal_to_decimal(r_2, result);
   }
   return status;
@@ -192,7 +124,6 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
   return status;
 }
 
-// <
 int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   CompareStatus status = TRUE;
   normalization_decimal(&value_1, &value_2);
@@ -210,23 +141,19 @@ int s21_is_less(s21_decimal value_1, s21_decimal value_2) {
   return status;
 }
 
-// <=
 int s21_is_less_or_equal(s21_decimal value_1, s21_decimal value_2) {
   normalization_decimal(&value_1, &value_2);
   return s21_is_less(value_1, value_2) || s21_is_equal(value_1, value_2);
 }
 
-// >
 int s21_is_greater(s21_decimal value_1, s21_decimal value_2) {
   return !s21_is_less_or_equal(value_1, value_2);
 }
 
-// >=
 int s21_is_greater_or_equal(s21_decimal value_1, s21_decimal value_2) {
   return !s21_is_less(value_1, value_2);
 }
 
-// ==
 int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
   CompareStatus status = FALSE;
   normalization_decimal(&value_1, &value_2);
@@ -240,7 +167,6 @@ int s21_is_equal(s21_decimal value_1, s21_decimal value_2) {
   return status;
 }
 
-// !=
 int s21_is_not_equal(s21_decimal value_1, s21_decimal value_2) {
   return !s21_is_equal(value_1, value_2);
 }
@@ -271,21 +197,14 @@ int s21_from_float_to_decimal(float src, s21_decimal *dst) {
   if (src > 0 && src < pow(10, -EXP_MAX)) {
     status = STATUS_ERR;
   } else if (src != 0) {
-    // приведение float
     float_to_scientific_notation_base_10(src, FLOAT_NUMBER_SIGNIFICANT_DIGITS,
                                          &mantissa, &exp);
-    // printf("MANTISSA = %7d\n", mantissa);
-    // printf("EXP = %7d\n", exp);
     copy_ints(&mantissa, dst->bits, 0);
-    // print_decimal_in_dec(*dst);
-    // сведение положительной экспоненты к нулю
     while (status == STATUS_OK && exp > EXP_MIN) {
       status = s21_mul(*dst, (s21_decimal){{10, 0, 0, 0}}, dst);
       exp -= 1;
     }
-    // print_decimal_in_dec(*dst);
   }
-  // если экспонента  MMMMMMM*10^() 1234567*10^28
   if (status == STATUS_OK && -exp >= EXP_MIN && -exp <= EXP_MAX) {
     set_exp_decimal(dst, -exp);
     set_sign_decimal(dst, sign);
@@ -338,7 +257,6 @@ int s21_from_decimal_to_int(s21_decimal src, int *dst) {
   return status;
 }
 
-// ближайшее целое число в сторону отрицательной бесконечности
 int s21_floor(s21_decimal value, s21_decimal *result) {
   int exp = get_exp_decimal(value);
   s21_decimal remainder = {
@@ -362,7 +280,6 @@ int s21_floor(s21_decimal value, s21_decimal *result) {
   return 0;
 }
 
-// ближайшее целое число
 int s21_round(s21_decimal value, s21_decimal *result) {
   int exp = get_exp_decimal(value);
   s21_decimal remainder = {
