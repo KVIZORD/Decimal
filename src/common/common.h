@@ -91,6 +91,7 @@ int reset_bit_int(int* number, int ind);
 
 // print.c
 void print_binary_int(int number);
+void print_binary_ints(int* ints, int count_int);
 void print_decimal(s21_decimal value);
 void print_double_decimal(s21_double_decimal value);
 void print_decimal_in_dec(s21_decimal value);

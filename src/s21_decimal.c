@@ -4,13 +4,11 @@
 #include <math.h>
 
 #include "common/common.h"
-//  1101101111100111000000000011010 10110001011000100101101110010101
-//  00100010000000000000000000000000
-//                                ||                              || |
+
 // int main() {
-//   // s21_decimal a = {{0, 0, 0, 0 << 16}};
-//   // s21_decimal b = {{0, 0, 0, 1 << 16}};
-//   // s21_decimal c = {{0, 0, 0, 0}};
+//   // s21_decimal a = {{2, 0, 0, 0 << 16}};
+//   // s21_decimal b = {{3, 0, 0, 1 << 16}};
+//   s21_decimal c = {{0, 0, 0, 0}};
 //   // set_sign_decimal(&a, 1);
 //   // set_sign_decimal(&b, 1);
 //   // a.bits[0] = 0b00100010000000000000000000000000;
@@ -21,23 +19,46 @@
 //   // b.bits[0] = 0xffffffff;
 //   // b.bits[1] = 0xffffffff;
 //   // b.bits[2] = 0xffffffff;
-
 //   // s21_decimal val_1 = {{int_1, 0, 0, 1 << 31}};
 //   // s21_decimal val_2 = {{int_2, 0, 0, 0}};
-
-//   // printf("result = %d\n", s21_mul(a, b, &c));
+//   //  printf("result = %d\n", s21_div(a, b, &c));
+//   // s21_decimal a = {{0b11111111111111111111111111111111,
+//   //                       0b11111111111111111111111111111111,
+//   //                       0b11111111111111111111111111111111, 0x00000000}};
+//   // s21_decimal b = {{55, 0b0, 0b0, 0x00010000}};
+//   // s21_double_decimal a = {{
+//   //   0b11000000000000000000000000000000,
+//   //   0b00100101000110111101000001101010,
+//   //   0b01111001110000111110000010100011,
+//   //   0b00111111111111111111111111111101,
+//   //   0b11011010111001000010111110010101,
+//   //   0b10000110001111000001111101011100,
+//   //   0b00000000000000000000000000000000
+//   // }};
+//   // s21_double_decimal b = {{
+//   //   0b11000000000000000000000000000000,
+//   //   0b00100101000110111101000001101010,
+//   //   0b01111001110000111110000010100011,
+//   //   0b00111111111111111111111111111101,
+//   //   0b11011010111001000010111110010101,
+//   //   0b10000110001111000001111101011100,
+//   //   0b00000000000000000000000000000000
+//   // }};
+//   // s21_double_decimal c = {0, };
+//   // printf("sum_ints = %d\n", sum_ints(a.bits, b.bits, c.bits, 2 *
+//   INTS_IN_DECIMAL));
+//   // s21_decimal res = {
+//   //     0,
+//   // };
+//   // printf("result = %d\n", s21_div(val_1, val_2, &res));
+//   printf("result = %d\n", s21_div(a, b, &c));
 //   // printf("result = %d\n", s21_is_less(a, b));
-
-//   s21_decimal res = {
-//       0,
-//   };
-//   printf("result = %d\n", s21_mul(val_1, val_2, &res));
-//   print_decimal_in_dec(val_1);
-//   print_decimal_in_dec(val_2);
-//   print_decimal_in_dec(res);
-//   // print_decimal_in_dec(a);
-//   // print_decimal_in_dec(b);
-//   // print_decimal_in_dec(c);
+//   // print_decimal_in_dec(val_1);
+//   // print_decimal_in_dec(val_2);
+//   // print_decimal_in_dec(res);
+//    print_decimal_in_dec(a);
+//    print_decimal_in_dec(b);
+//    print_decimal_in_dec(c);
 //   return 0;
 // }
 
@@ -127,23 +148,48 @@ int s21_div(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     };
     decimal_to_double_decimal(value_1, &v_1);
     decimal_to_double_decimal(value_2, &v_2);
-    casting_exp_double_decimal(v_1, &v_1, EXP_MAX);
+    // print_double_decimal_in_dec(v_1);
+    casting_exp_double_decimal(v_1, &v_1, EXP_MAX * 2 - 1);
+    // print_double_decimal_in_dec(v_1);
+    // print_double_decimal(v_1);
     div_double_decimal(v_1, v_2, &r_2);
     set_sign_double_decimal(
         &r_2, get_sign_decimal(value_1) ^ get_sign_decimal(value_2));
     set_exp_double_decimal(
         &r_2, get_exp_double_decimal(v_1) - get_exp_double_decimal(v_2));
+    // print_double_decimal_in_dec(v_2);
+    // print_double_decimal_in_dec(r_2);
+    // print_double_decimal(r_2);
     status = double_decimal_to_decimal(r_2, result);
   }
   return status;
 }
 
 int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
-  s21_decimal quotient = {
-      0,
-  };
-  div_decimal_with_remainder(value_1, value_2, &quotient, result);
-  return 1;
+  ArithmeticStatus status = OK;
+  if (is_zero_decimal(value_2)) {
+    status = DIV_ZERO;
+  } else {
+    int sign;
+    s21_decimal quotient = {
+        0,
+    };
+    s21_decimal res_mul = {{
+        0,
+    }};
+    sign = get_sign_decimal(value_1);
+    normalization_decimal(&value_1, &value_2);
+    set_sign_decimal(&value_1, 0);
+    set_sign_decimal(&value_2, 0);
+    div_decimal_with_remainder(value_1, value_2, &quotient,
+                               &(s21_decimal){{
+                                   0,
+                               }});
+    s21_mul(quotient, value_2, &res_mul);
+    s21_sub(value_1, res_mul, result);
+    set_sign_decimal(result, sign);
+  }
+  return status;
 }
 
 // <

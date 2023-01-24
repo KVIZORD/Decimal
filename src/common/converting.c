@@ -43,12 +43,16 @@ int double_decimal_to_decimal(s21_double_decimal src, s21_decimal* dst) {
   int exp = get_exp_double_decimal(src);
   ArithmeticStatus status = OK;
   s21_double_decimal remainder = {0,};
+  // print_double_decimal(src);
+  // print_double_decimal_in_dec(src);
   // деление "double_decimal" на 10 пока его мантиса не поместится в "decimal"
-  while (exp < 2 * EXP_MAX && get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
+  while (exp < 2 * EXP_MAX && (exp > EXP_MAX || get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT)) {
     div_double_decimal_with_remainder(src, (s21_double_decimal){{10, 0,}}, &src, &remainder);
     exp -= 1;
   }
   // print_double_decimal_in_dec(src);
+  // print_double_decimal(src);
+  // printf("exp = %d\n", exp);
   if (exp > EXP_MAX || exp < 0) {
     status = sign ? INF_NEGAT : INF_POSIT;
   } else if (get_width_number_bits_non_blunk(src.bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {

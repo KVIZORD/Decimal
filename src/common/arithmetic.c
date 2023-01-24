@@ -177,17 +177,19 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
   int status = 0;
   s21_double_decimal complement = {0,};
   copy_double_decimal(divisor, &complement);
-  convert_ints_to_twos_complement(complement.bits, 2 * INTS_IN_DECIMAL);
   if (!is_zero_double_decimal(divisor)) {
+    convert_ints_to_twos_complement(complement.bits, 2 * INTS_IN_DECIMAL);
     s21_double_decimal tmp = {
         0,
     };
+    // print_double_decimal(complement);
     for (int num_int = 2 * INTS_IN_DECIMAL - 1; num_int >= 0; num_int--) {
       for (int num_bit = BITS_IN_INT - 1; num_bit >= 0; num_bit--) {
         left_shift_double_decimal(&tmp);
         if (get_bit_double_decimal(dividend, num_int, num_bit)) {
           set_bit_double_decimal(&tmp, 0, 0);
         }
+        // print_double_decimal_in_dec(tmp);
         if (is_greater_ints(tmp.bits, divisor.bits, 2 * INTS_IN_DECIMAL)) {
           sum_ints(tmp.bits, complement.bits, tmp.bits, 2 * INTS_IN_DECIMAL);
           set_bit_double_decimal(result, num_int, num_bit);
@@ -199,6 +201,11 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
         }
       }
     }
+    // while (get_width_number_bits_non_blunk(result->bits, 2 * INTS_IN_DECIMAL) > INTS_IN_DECIMAL * BITS_IN_INT) {
+    //   left_shift_double_decimal(&tmp);
+    // }
+    // print_double_decimal_in_dec(*result);
+    // print_double_decimal(*result);
   } else {
     status = 3;
   }
@@ -206,33 +213,46 @@ int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
 }
 
 int mul_ints(int* value_1, int* value_2, int* result, int count_int) {
+  int status = 0;
+  int state = 0;
   for (int i = 0; i < count_int; i++) {
     for (int j = 0; j < BITS_IN_INT; j++) {
       if (get_bit_ints(value_2, i, j)) {
-        sum_ints(result, value_1, result, count_int);
+        if (state) {
+          status |= 1;
+        }
+        status |= sum_ints(result, value_1, result, count_int);
+        if (status) {
+          break;
+        }
+      }
+      if (get_bit_ints(value_1, count_int - 1, BITS_IN_INT - 1)) {
+        state = 1;
       }
       left_shift_ints(value_1, count_int);
     }
+    if (status) {
+      break;
+    }
   }
-
-  return 0;
+  return status;
 }
 
-void casting_exp_double_decimal(s21_double_decimal value,
-                                s21_double_decimal* result, int exp_new) {
+void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new) {
   int exp = get_exp_double_decimal(value);
-  s21_double_decimal then = {
-      0,
-  };
-  then.bits[0] = 10;
+  int sign = get_sign_double_decimal(value);
+  s21_double_decimal ten = {{10,}};
+  s21_double_decimal tmp = {0,};
+  value.bits[2 * INTS_IN_DECIMAL] = 0;
   for (; exp < exp_new; exp++) {
-    copy_double_decimal(
-        (s21_double_decimal){
-            0,
-        },
-        result);
-    mul_ints(value.bits, then.bits, result->bits, 2 * INTS_IN_DECIMAL);
-    copy_double_decimal(*result, &value);
+    clear_double_decimal(&tmp);
+    int status = mul_ints(value.bits, ten.bits, tmp.bits, 2 * INTS_IN_DECIMAL);
+    if (status) {
+      break;
+    }
+    copy_double_decimal(tmp, &value);
+    copy_double_decimal(tmp, result);
   }
   set_exp_double_decimal(result, exp);
+  set_sign_double_decimal(result, sign);
 }

@@ -2344,7 +2344,6 @@
         #test pos_norm_div__pos_norm
             // 50 0000 0000 0000 0000 0000
             // 555555555555555555.5555555 / 111111111111111111.1111111 = 5
-            //                        100001111 00001100111100000110010011011101 01011001001000000000000000000000
             //                                ||                              ||                               |
             s21_decimal val_1 = {{
                 0b01000101100011100011100011100011,
@@ -2364,218 +2363,334 @@
             // print_decimal_in_dec(val_2);
             // print_decimal_in_dec(res);
             ck_assert_int_eq(status, 0);
-            ck_assert_int_eq(res.bits[0], (int)0b01011001001000000000000000000000);
-            ck_assert_int_eq(res.bits[1], (int)0b00001100111100000110010011011101);
-            ck_assert_int_eq(res.bits[2], (int)0b100001111);
-            ck_assert_int_eq(res.bits[3], (int)0x00150000);
+            ck_assert_int_eq(res.bits[0], (int)0b01010000000000000000000000000000);
+            ck_assert_int_eq(res.bits[1], (int)0b00110110101110010000101111100101);
+            ck_assert_int_eq(res.bits[2], (int)0b10100001100011110000011111010111);
+            ck_assert_int_eq(res.bits[3], (int)0x001c0000);
 
-//        #test neg_norm__mul__pos_norm
-//            // -85833105.762574984579732 * 235467.46665509876438976547 = -20210903969052.690782777499664
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b00000000000000001000101010010100,
-//                0b00000101101000001110111111000111,
-//                0b1001000101101,
-//                0x800f0000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b11110101010100001100100000100011,
-//                0b10110001110010011100111010011000,
-//                0b100110111101000110111,
-//                0x00140000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b11110000010001111110000000010000);
-//            ck_assert_int_eq(res.bits[1], (int)0b10001110101000001101010010100101);
-//            ck_assert_int_eq(res.bits[2], (int)0b1000001010011100001000101100011);
-//            ck_assert_int_eq(res.bits[3], (int)0x800f0000);
-//
-//        #test pos_norm__mul__neg_norm
-//            // 85833105.762574984579732 * (-235467.46665509876438976547) = -20210903969052.690782777499664
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b00000000000000001000101010010100,
-//                0b00000101101000001110111111000111,
-//                0b1001000101101,
-//                0x000f0000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b11110101010100001100100000100011,
-//                0b10110001110010011100111010011000,
-//                0b100110111101000110111,
-//                0x80140000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b11110000010001111110000000010000);
-//            ck_assert_int_eq(res.bits[1], (int)0b10001110101000001101010010100101);
-//            ck_assert_int_eq(res.bits[2], (int)0b1000001010011100001000101100011);
-//            ck_assert_int_eq(res.bits[3], (int)0x800f0000);
-//
-//        #test neg_norm__mul__neg_norm
-//            // -85833105.762574984579732 * (-235467.46665509876438976547) = 20210903969052.690782777499664
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b00000000000000001000101010010100,
-//                0b00000101101000001110111111000111,
-//                0b1001000101101,
-//                0x800f0000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b11110101010100001100100000100011,
-//                0b10110001110010011100111010011000,
-//                0b100110111101000110111,
-//                0x80140000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b11110000010001111110000000010000);
-//            ck_assert_int_eq(res.bits[1], (int)0b10001110101000001101010010100101);
-//            ck_assert_int_eq(res.bits[2], (int)0b1000001010011100001000101100011);
-//            ck_assert_int_eq(res.bits[3], (int)0x000f0000);
-//
-//        #test neg_max_mul_zero_1
-//            // -79228162514264337593543950335 * 0 = 0
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0x80000000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b0,
-//                0b0,
-//                0b0,
-//                0x00020000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b0);
-//            ck_assert_int_eq(res.bits[1], (int)0b0);
-//            ck_assert_int_eq(res.bits[2], (int)0b0);
-//            //ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//
-//        #test zero_mul_pos_max_1
-//            // -0.00 * 79228162514264337593543950335 = 0
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b0,
-//                0b0,
-//                0b0,
-//                0x00020000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0x00000000
-//            }};
-//
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b0);
-//            ck_assert_int_eq(res.bits[1], (int)0b0);
-//            ck_assert_int_eq(res.bits[2], (int)0b0);
-//            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//
-//        #test zero_mul_neg_max_1
-//            // -0.00 * 79228162514264337593543950335 = 0
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b0,
-//                0b0,
-//                0b0,
-//                0x80020000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0x80000000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 0);
-//            ck_assert_int_eq(res.bits[0], (int)0b0);
-//            ck_assert_int_eq(res.bits[1], (int)0b0);
-//            ck_assert_int_eq(res.bits[2], (int)0b0);
-//            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//
-//    #tcase s21_mul_func__error
-//        #test mul_error_pos_inf_1
-//            // 79228162514264337593543950335 * 2 = INF_POSIT
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0x00000000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b10,
-//                0b0,
-//                0b0,
-//                0x00000000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 1);
-//            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
-//            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//        #test mul_error_neg_inf_1
-//            // -79228162514264337593543950335 * 2 = INF_NEGAT
-//            //                                ||                              ||                               |
-//            s21_decimal val_1 = {{
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0b11111111111111111111111111111111,
-//                0x80000000
-//            }};
-//            s21_decimal val_2 = {{
-//                0b10,
-//                0b0,
-//                0b0,
-//                0x00000000
-//            }};
-//            s21_decimal res = {0,};
-//            int status = s21_mul(val_1, val_2, &res);
-//            // print_decimal_in_dec(val_1);
-//            // print_decimal_in_dec(val_2);
-//            // print_decimal_in_dec(res);
-//            ck_assert_int_eq(status, 2);
-//            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
-//            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
-//            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
-//
-//
+        #test neg_norm_div__pos_norm
+            // 50 0000 0000 0000 0000 0000
+            // -555555555555555555.5555555 / 111111111111111111.1111111 = -5
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b01000101100011100011100011100011,
+                0b01000101001001111000111011101111,
+                0b1001001100001101111,
+                0x80070000
+            }};
+            s21_decimal val_2 = {{
+                0b01000001000111000111000111000111,
+                0b01110100001110110001110010010110,
+                0b1110101101001001,
+                0x00070000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_div(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 0);
+            ck_assert_int_eq(res.bits[0], (int)0b01010000000000000000000000000000);
+            ck_assert_int_eq(res.bits[1], (int)0b00110110101110010000101111100101);
+            ck_assert_int_eq(res.bits[2], (int)0b10100001100011110000011111010111);
+            ck_assert_int_eq(res.bits[3], (int)0x801c0000);
+
+        #test pos_norm_div__neg_norm
+            // 50 0000 0000 0000 0000 0000
+            // 555555555555555555.5555555 / (-111111111111111111.1111111) = -5
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b01000101100011100011100011100011,
+                0b01000101001001111000111011101111,
+                0b1001001100001101111,
+                0x00070000
+            }};
+            s21_decimal val_2 = {{
+                0b01000001000111000111000111000111,
+                0b01110100001110110001110010010110,
+                0b1110101101001001,
+                0x80070000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_div(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 0);
+            ck_assert_int_eq(res.bits[0], (int)0b01010000000000000000000000000000);
+            ck_assert_int_eq(res.bits[1], (int)0b00110110101110010000101111100101);
+            ck_assert_int_eq(res.bits[2], (int)0b10100001100011110000011111010111);
+            ck_assert_int_eq(res.bits[3], (int)0x801c0000);
+
+        #test neg_norm_div__neg_norm
+            // 50 0000 0000 0000 0000 0000
+            // -555555555555555555.5555555 / (-111111111111111111.1111111) = 5
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b01000101100011100011100011100011,
+                0b01000101001001111000111011101111,
+                0b1001001100001101111,
+                0x80070000
+            }};
+            s21_decimal val_2 = {{
+                0b01000001000111000111000111000111,
+                0b01110100001110110001110010010110,
+                0b1110101101001001,
+                0x80070000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_div(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 0);
+            ck_assert_int_eq(res.bits[0], (int)0b01010000000000000000000000000000);
+            ck_assert_int_eq(res.bits[1], (int)0b00110110101110010000101111100101);
+            ck_assert_int_eq(res.bits[2], (int)0b10100001100011110000011111010111);
+            ck_assert_int_eq(res.bits[3], (int)0x001c0000);
+
+    #tcase s21_div_func__error
+        #test div_error_pos_inf_1
+            // 79228162514264337593543950335 / 0.5 = INF_POSIT
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
+                0x00000000
+            }};
+            s21_decimal val_2 = {{
+                0b101,
+                0b0,
+                0b0,
+                0x00010000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_div(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 1);
+            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
+            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
+        #test div_error_neg_inf_1
+            // -79228162514264337593543950335 / 0.5 = INF_NEGAT
+            //                                ||                              ||                               |
+            s21_decimal val_1 = {{
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
+                0b11111111111111111111111111111111,
+                0x80000000
+            }};
+            s21_decimal val_2 = {{
+                0b101,
+                0b0,
+                0b0,
+                0x00010000
+            }};
+            s21_decimal res = {0,};
+            int status = s21_div(val_1, val_2, &res);
+            // print_decimal_in_dec(val_1);
+            // print_decimal_in_dec(val_2);
+            // print_decimal_in_dec(res);
+            ck_assert_int_eq(status, 2);
+            // ck_assert_int_eq(res.bits[0], (int)0b10011001100110011001100110011010);
+            // ck_assert_int_eq(res.bits[1], (int)0b10011001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[2], (int)0b11001100110011001100110011001);
+            // ck_assert_int_eq(res.bits[3], (int)0x00000000);
+
+#suite arithmetic_mod
+    #tcase s21_mod
+        #test s21_mod_int_remainder_zero
+        int num_1 = 3;
+        int num_2 = 1;
+        s21_decimal a = {{num_1, 0, 0, 0}};
+        s21_decimal b = {{num_2, 0, 0, 0}};
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        int res;
+        s21_from_decimal_to_int(c, &res);
+        int res_origin = num_1 % num_2;
+        ck_assert_int_eq(res, res_origin);
+
+        #test s21_mod_int_remainder
+        int num_1 = 5;
+        int num_2 = 3;
+        s21_decimal a = {{num_1, 0, 0, 0}};
+        s21_decimal b = {{num_2, 0, 0, 0}};
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        int res;
+        s21_from_decimal_to_int(c, &res);
+        int res_origin = num_1 % num_2;
+        ck_assert_int_eq(res, res_origin);
+
+        #test s21_mod_int_remainder_first_neg
+        int num_1 = -5;
+        int num_2 = 3;
+        s21_decimal a = {{5, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        s21_decimal b = {{3, 0, 0, 0}};
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        int res;
+        s21_from_decimal_to_int(c, &res);
+        int res_origin = num_1 % num_2;
+        ck_assert_int_eq(res, res_origin);
+
+        #test s21_mod_int_remainder_secong_neg
+        int num_1 = 5;
+        int num_2 = -3;
+        s21_decimal a = {{5, 0, 0, 0}};
+        s21_decimal b = {{3, 0, 0, 0}};
+        set_sign_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        int res;
+        s21_from_decimal_to_int(c, &res);
+        int res_origin = num_1 % num_2;
+        ck_assert_int_eq(res, res_origin);
+
+        #test s21_mod_int_remainder_both_neg
+        int num_1 = -5;
+        int num_2 = -3;
+        s21_decimal a = {{5, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        s21_decimal b = {{3, 0, 0, 0}};
+        set_sign_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        int res;
+        s21_from_decimal_to_int(c, &res);
+        int res_origin = num_1 % num_2;
+        ck_assert_int_eq(res, res_origin);
+
+        #test s21_mod_float_remainder_zero
+        float num_1 = 3;
+        float num_2 = 0.5;
+        s21_decimal a = {{3, 0, 0, 0}};
+        s21_decimal b = {{5, 0, 0, 0}};
+        set_exp_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq(res, res_origin);
+
+        #test s21_mod_float_remainder
+        float num_1 = 3;
+        float num_2 = 0.5;
+        s21_decimal a = {{3, 0, 0, 0}};
+        s21_decimal b = {{5, 0, 0, 0}};
+        set_exp_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq(res, res_origin);
+
+        #test s21_mod_float_remainder_first_neg
+        float num_1 = -3;
+        float num_2 = 0.5;
+        s21_decimal a = {{3, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        s21_decimal b = {{5, 0, 0, 0}};
+        set_exp_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq(res, res_origin);
+
+        #test s21_mod_float_remainder_second_neg
+        float num_1 = 3;
+        float num_2 = -0.5;
+        s21_decimal a = {{3, 0, 0, 0}};
+        s21_decimal b = {{5, 0, 0, 0}};
+        set_sign_decimal(&b, 1);
+        set_exp_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq(res, res_origin);
+
+        #test s21_mod_float_remainder_both_neg
+        float num_1 = -3;
+        float num_2 = -0.5;
+        s21_decimal a = {{3, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        s21_decimal b = {{5, 0, 0, 0}};
+        set_sign_decimal(&b, 1);
+        set_exp_decimal(&b, 1);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq(res, res_origin);
+
+        #test s21_mod_float_remainder_2
+        float num_1 = 0.334;
+        float num_2 = 0.255;
+        s21_decimal a = {{334, 0, 0, 0}};
+        set_exp_decimal(&a, 3);
+        s21_decimal b = {{255, 0, 0, 0}};
+        set_exp_decimal(&b, 3);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq_tol(res, res_origin, 0.0000001);
+
+        #test s21_mod_float_remainder_3
+        float num_1 = -0.334;
+        float num_2 = 0.255;
+        s21_decimal a = {{334, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        set_exp_decimal(&a, 3);
+        s21_decimal b = {{255, 0, 0, 0}};
+        set_exp_decimal(&b, 3);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq_tol(res, res_origin, 0.0000001);
+
+        #test s21_mod_float_remainder_4
+        float num_1 = -0.33564;
+        float num_2 = 0.25;
+        s21_decimal a = {{33564, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        set_exp_decimal(&a, 5);
+        s21_decimal b = {{25, 0, 0, 0}};
+        set_exp_decimal(&b, 2);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq_tol(res, res_origin, 0.0000001);
+
+        #test s21_mod_float_remainder_5
+        float num_1 = -25.33564;
+        float num_2 = 1.25;
+        s21_decimal a = {{2533564, 0, 0, 0}};
+        set_sign_decimal(&a, 1);
+        set_exp_decimal(&a, 5);
+        s21_decimal b = {{125, 0, 0, 0}};
+        set_exp_decimal(&b, 2);
+        s21_decimal c;
+        s21_mod(a, b, &c);
+        float res;
+        s21_from_decimal_to_float(c, &res);
+        float res_origin = fmod(num_1, num_2);
+        ck_assert_float_eq_tol(res, res_origin, 0.0000001);

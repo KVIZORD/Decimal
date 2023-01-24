@@ -6,6 +6,14 @@ void print_binary_int(int number) {
   }
 }
 
+void print_binary_ints(int* ints, int count_int) {
+  for (int i = count_int; i >= 0; i--) {
+    print_binary_int(ints[i]);
+    printf("|");
+  }
+  printf("\n");
+}
+
 void print_decimal(s21_decimal value) {
   for (int i = INTS_IN_DECIMAL; i >= 0; i--) {
     print_binary_int(value.bits[i]);
