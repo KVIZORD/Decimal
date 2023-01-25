@@ -108,17 +108,26 @@ int div_double_decimal_with_remainder(s21_double_decimal dividend,
   return status;
 }
 
-void mul_double_decimal(s21_double_decimal value_1, s21_double_decimal value_2, s21_double_decimal* result) {
+void mul_double_decimal(s21_double_decimal value_1, s21_double_decimal value_2,
+                        s21_double_decimal* result) {
   clear_double_decimal(result);
   mul_ints(value_1.bits, value_2.bits, result->bits, 2 * INTS_IN_DECIMAL);
-  set_sign_double_decimal(result, get_sign_double_decimal(value_1) ^ get_sign_double_decimal(value_2));
-  set_exp_double_decimal(result, get_exp_double_decimal(value_1) + get_exp_double_decimal(value_2));
+  set_sign_double_decimal(result, get_sign_double_decimal(value_1) ^
+                                      get_sign_double_decimal(value_2));
+  set_exp_double_decimal(result, get_exp_double_decimal(value_1) +
+                                     get_exp_double_decimal(value_2));
 }
 
 int add_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
-  s21_double_decimal double_v1 = {0,};
-  s21_double_decimal double_v2 = {0,};
-  s21_double_decimal double_r = {0,};
+  s21_double_decimal double_v1 = {
+      0,
+  };
+  s21_double_decimal double_v2 = {
+      0,
+  };
+  s21_double_decimal double_r = {
+      0,
+  };
   decimal_to_double_decimal(value_1, &double_v1);
   decimal_to_double_decimal(value_2, &double_v2);
   normalization_double_decimal(&double_v1, &double_v2);
@@ -128,9 +137,15 @@ int add_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
 }
 
 int sub_decimal(s21_decimal value_1, s21_decimal value_2, s21_decimal* result) {
-  s21_double_decimal double_v1 = {0,};
-  s21_double_decimal double_v2 = {0,};
-  s21_double_decimal double_r = {0,};
+  s21_double_decimal double_v1 = {
+      0,
+  };
+  s21_double_decimal double_v2 = {
+      0,
+  };
+  s21_double_decimal double_r = {
+      0,
+  };
   decimal_to_double_decimal(value_1, &double_v1);
   decimal_to_double_decimal(value_2, &double_v2);
   normalization_double_decimal(&double_v1, &double_v2);
@@ -168,7 +183,9 @@ int is_equal_ints(int* value_1, int* value_2, int count_int) {
 int div_double_decimal(s21_double_decimal dividend, s21_double_decimal divisor,
                        s21_double_decimal* result) {
   int status = 0;
-  s21_double_decimal complement = {0,};
+  s21_double_decimal complement = {
+      0,
+  };
   copy_double_decimal(divisor, &complement);
   if (!is_zero_double_decimal(divisor)) {
     convert_ints_to_twos_complement(complement.bits, 2 * INTS_IN_DECIMAL);
@@ -224,11 +241,16 @@ int mul_ints(int* value_1, int* value_2, int* result, int count_int) {
   return status;
 }
 
-void casting_exp_double_decimal(s21_double_decimal value, s21_double_decimal* result, int exp_new) {
+void casting_exp_double_decimal(s21_double_decimal value,
+                                s21_double_decimal* result, int exp_new) {
   int exp = get_exp_double_decimal(value);
   int sign = get_sign_double_decimal(value);
-  s21_double_decimal ten = {{10,}};
-  s21_double_decimal tmp = {0,};
+  s21_double_decimal ten = {{
+      10,
+  }};
+  s21_double_decimal tmp = {
+      0,
+  };
   value.bits[2 * INTS_IN_DECIMAL] = 0;
   for (; exp < exp_new; exp++) {
     clear_double_decimal(&tmp);

@@ -50,7 +50,7 @@ test: clean $(MAIN_FILE).a
 	./$(TEST)
 
 check: test
-	clang-format --style=Google -n *.c *.h
+	clang-format --style=Google -n *.c *.h common/*
 	cppcheck --check-config --enable=all --suppress=missingIncludeSystem *.c *.h
 	$(MEMORY_TEST) ./$(TEST) 
 
@@ -70,4 +70,4 @@ autotest: $(MAIN_FILE).a
 	clang-format --style=Google -i *.c *.h
 
 format:
-	clang-format --style=Google -i *.c *.h common/*.c
+	clang-format --style=Google -i *.c *.h common/*

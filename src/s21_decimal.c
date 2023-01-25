@@ -103,22 +103,42 @@ int s21_mod(s21_decimal value_1, s21_decimal value_2, s21_decimal *result) {
     status = DIV_ZERO;
   } else {
     int sign;
-    s21_decimal quotient = {
+    s21_double_decimal v_1 = {
         0,
     };
-    s21_decimal res_mul = {{
+    s21_double_decimal v_2 = {
         0,
-    }};
+    };
+    s21_double_decimal r_2 = {
+        0,
+    };
+    s21_double_decimal quotient = {
+        0,
+    };
+    s21_double_decimal res_mul = {
+        0,
+    };
+    decimal_to_double_decimal(value_1, &v_1);
+    decimal_to_double_decimal(value_2, &v_2);
     sign = get_sign_decimal(value_1);
-    normalization_decimal(&value_1, &value_2);
-    set_sign_decimal(&value_1, 0);
-    set_sign_decimal(&value_2, 0);
-    div_decimal_with_remainder(value_1, value_2, &quotient,
-                               &(s21_decimal){{
-                                   0,
-                               }});
-    s21_mul(quotient, value_2, &res_mul);
-    s21_sub(value_1, res_mul, result);
+    normalization_double_decimal(&v_1, &v_2);
+    set_sign_double_decimal(&v_1, 0);
+    set_sign_double_decimal(&v_2, 0);
+    div_double_decimal_with_remainder(v_1, v_2, &quotient,
+                                      &(s21_double_decimal){
+                                          0,
+                                      });
+
+    mul_ints(quotient.bits, v_2.bits, r_2.bits, 2 * INTS_IN_DECIMAL);
+    set_exp_double_decimal(
+        &r_2, get_exp_double_decimal(quotient) + get_exp_double_decimal(v_2));
+
+    normalization_double_decimal(&v_1, &r_2);
+    convert_double_decimal_to_twos_complement(&r_2);
+    sum_ints(v_1.bits, r_2.bits, res_mul.bits, 2 * INTS_IN_DECIMAL);
+    res_mul.bits[2 * INTS_IN_DECIMAL] = v_1.bits[2 * INTS_IN_DECIMAL];
+
+    status = double_decimal_to_decimal(res_mul, result);
     set_sign_decimal(result, sign);
   }
   return status;
